@@ -93,6 +93,7 @@ public final class StoryWorld {
             for (ServerLevel level : server.getAllLevels()) {
                 if (!level.players().isEmpty()) {
                     ensureWorld(level);
+                    ensureChapter2World(level);
                     spawnNpcs(level);
                     triggerProximityScenes(level);
                     for (ServerPlayer player : level.players()) StoryQuestSystem.tick(player);
@@ -199,6 +200,38 @@ public final class StoryWorld {
         // Deep chamber with a visible black-crystal focus.
         buildHeartChamber(level, 45, oy - 10, 20);
         saved.markBuilt();
+    }
+
+
+    private static void ensureChapter2World(ServerLevel level) {
+        Chapter2WorldSavedData saved = Chapter2WorldSavedData.get(level);
+        if (saved.built()) return;
+        int y = 64;
+        // Northern star trail and the first four-star gate.
+        for (int x = 46; x <= 62; x++) {
+            for (int z = -34; z <= -8; z++) {
+                if ((x + z) % 7 == 0) level.setBlockAndUpdate(new BlockPos(x, y - 1, z), Blocks.MOSS_BLOCK.defaultBlockState());
+            }
+        }
+        makeMarker(level, 54, y, -24, Blocks.AMETHYST_BLOCK.defaultBlockState());
+        makeMarker(level, 12, y, -2, Blocks.SOUL_SOIL.defaultBlockState());
+        makeMarker(level, 22, y, 8, Blocks.BELL.defaultBlockState());
+        makeMarker(level, 54, y, -8, Blocks.CARTOGRAPHY_TABLE.defaultBlockState());
+        makeMarker(level, 48, y, -18, Blocks.CHISELED_DEEPSLATE.defaultBlockState());
+        buildStarGate(level, 52, y - 10, -30);
+        buildStarGate(level, 58, y - 10, -30);
+        saved.markBuilt();
+    }
+
+    private static void buildStarGate(ServerLevel level, int x, int y, int z) {
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dy = 0; dy <= 5; dy++) {
+                boolean edge = Math.abs(dx) == 2 || dy == 0 || dy == 5;
+                level.setBlockAndUpdate(new BlockPos(x + dx, y + dy, z),
+                        edge ? Blocks.OBSIDIAN.defaultBlockState() : Blocks.AIR.defaultBlockState());
+            }
+        }
+        level.setBlockAndUpdate(new BlockPos(x, y + 2, z), Blocks.AMETHYST_BLOCK.defaultBlockState());
     }
 
     private static void makeChapel(ServerLevel level, int x, int y, int z) {
