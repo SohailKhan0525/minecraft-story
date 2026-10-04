@@ -50,7 +50,9 @@ jobs:
       - name: Prepare release assets
         run: |
           mkdir -p release
-          cp java/build/libs/*.jar "release/minecraft-story-java-${{ env.VERSION }}.jar"
+          JAVA_JAR=$(find java/build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' -print -quit)
+          test -n "$JAVA_JAR"
+          cp "$JAVA_JAR" "release/minecraft-story-java-${{ env.VERSION }}.jar"
           cp dist/minecraft-story-chapter-1.mcaddon "release/minecraft-story-bedrock-${{ env.VERSION }}.mcaddon"
       - uses: actions/upload-artifact@v4
         with:
