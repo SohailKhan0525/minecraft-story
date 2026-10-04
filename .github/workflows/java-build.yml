@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "java/**"
+      - "tools/generate_story_audio.py"
       - ".github/workflows/java-build.yml"
   pull_request:
     paths:
@@ -22,6 +23,11 @@ jobs:
         with:
           distribution: temurin
           java-version: "25"
+      - name: Install voice/audio tools
+        run: sudo apt-get update && sudo apt-get install -y espeak ffmpeg
+        working-directory: .
+      - name: Generate Chapter 1 voice audio
+        run: python3 ../tools/generate_story_audio.py
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "9.6.0"
