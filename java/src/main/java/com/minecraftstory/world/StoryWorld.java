@@ -413,51 +413,38 @@ public final class StoryWorld {
                 if (!epilogueActive) continue;
             }
 
-            if ("elias".equals(id)) {
-                // Elias disappears from Havenfall when the quest begins, then is found at the forest trail.
-                String desiredName = spec.name;
-                double targetX = findEliasActive ? 39.5D : spec.x + 0.5D;
-                double targetY = spec.y;
-                double targetZ = findEliasActive ? -22.5D : spec.z + 0.5D;
-                level.getEntitiesOfClass(Villager.class,
-                                new AABB(-80, 40, -60, 80, 90, 40))
-                        .stream()
-                        .filter(v -> desiredName.equals(v.getCustomName() == null ? "" : v.getCustomName().getString()))
-                        .filter(v -> Math.abs(v.getX() - targetX) > 3.0D || Math.abs(v.getZ() - targetZ) > 3.0D)
-                        .forEach(Villager::discard);
+            double targetX = spec.x + 0.5D;
+            double targetY = spec.y;
+            double targetZ = spec.z + 0.5D;
+            if ("elias".equals(id) && findEliasActive) {
+                targetX = 39.5D;
+                targetZ = -22.5D;
+            }
 
-                boolean exists = level.getEntitiesOfClass(Villager.class,
-                        new AABB(targetX - 2, targetY - 1, targetZ - 2, targetX + 2, targetY + 3, targetZ + 2))
-                        .stream().anyMatch(v -> desiredName.equals(v.getCustomName() == null ? "" : v.getCustomName().getString()));
-                if (exists) continue;
+            String tag = "minecraftstory_npc:" + id;
+            var matches = level.getEntitiesOfClass(Villager.class,
+                    new AABB(-90, 40, -70, 90, 90, 50)).stream()
+                    .filter(v -> v.getTags().contains(tag))
+                    .toList();
+            for (int i = 1; i < matches.size(); i++) matches.get(i).discard();
 
-                Villager villager = (Villager) BuiltInRegistries.ENTITY_TYPE.getValue(
+            Villager villager = matches.isEmpty() ? null : matches.getFirst();
+            if (villager == null) {
+                villager = (Villager) BuiltInRegistries.ENTITY_TYPE.getValue(
                         Identifier.fromNamespaceAndPath("minecraft", "villager"))
                         .create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
                 if (villager == null) continue;
-                villager.setPos(targetX, targetY, targetZ);
-                villager.setCustomName(net.minecraft.network.chat.Component.literal(desiredName));
-                villager.setCustomNameVisible(true);
-                villager.addTag("minecraftstory_npc:elias");
+                villager.addTag(tag);
                 level.addFreshEntity(villager);
-                continue;
             }
-            boolean exists = level.getEntitiesOfClass(Villager.class,
-                    new AABB(spec.x - 2, spec.y - 1, spec.z - 2, spec.x + 2, spec.y + 3, spec.z + 2))
-                    .stream()
-                    .anyMatch(v -> id.equals(npcIdFrom(v)));
-            if (exists) continue;
 
-            Villager villager = (Villager) BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "villager")).create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-            if (villager == null) continue;
-            villager.setPos(spec.x + 0.5, spec.y, spec.z + 0.5);
+            villager.setPos(targetX, targetY, targetZ);
             villager.setCustomName(net.minecraft.network.chat.Component.literal(spec.name));
             villager.setCustomNameVisible(true);
-            villager.addTag("minecraftstory_npc:" + id);
-            level.addFreshEntity(villager);
+            villager.setPersistenceRequired();
+            villager.setInvulnerable(true);
         }
     }
-
     private static String npcIdFrom(Villager villager) {
         String name = villager.getCustomName() == null ? "" : villager.getCustomName().getString();
         return NPCS.entrySet().stream()
