@@ -4,6 +4,7 @@ import com.minecraftstory.story.StoryInteraction;
 import com.minecraftstory.story.StoryQuestSystem;
 import com.minecraftstory.story.StorySessionManager;
 import com.minecraftstory.story.StoryFlag;
+import com.minecraftstory.story.StoryState;
 import com.minecraftstory.story.StoryNetwork;
 import com.minecraftstory.story.StoryAmbientSystem;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -118,7 +119,7 @@ public final class StoryWorld {
 
     private static void runNpcSchedules(ServerLevel level) {
         if (++NPC_SCHEDULE_TICK % 200 != 0) return;
-        long day = level.getDayTime() % 24000L;
+        long day = level.getGameTime() % 24000L;
         for (Villager villager : level.getEntitiesOfClass(Villager.class, new AABB(-60, 40, -50, 60, 90, 38))) {
             String id = npcIdFrom(villager);
             if (id.isBlank() || villager.isDeadOrDying()) continue;
