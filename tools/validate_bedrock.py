@@ -31,6 +31,8 @@ def main() -> int:
 
     if not any(m.get("type") == "resources" for m in rp["modules"]):
         raise SystemExit("Bedrock resource pack has no resources module.")
+    if bp["header"]["min_engine_version"] < [1, 21, 130] or rp["header"]["min_engine_version"] < [1, 21, 130]:
+        raise SystemExit("Bedrock packs target an unsupported engine version.")
 
     expected = ["cold_open","havenfall","chapel","missing_sound","silent_forest",
                 "observatory","first_choice","door_below","heart","ending","post_credits",
@@ -47,6 +49,10 @@ def main() -> int:
     js = (BP / "scripts/main.js").read_text(encoding="utf-8")
     if "playSound" not in js or "minecraftstory:voice." not in js:
         raise SystemExit("Bedrock runtime is missing player-local voice playback.")
+    if 'minecraft:villager_v2<minecraft:ageable_grow_up>' not in js or 'initialPersistence:true' not in js:
+        raise SystemExit("Bedrock runtime is not using persistent story NPC spawning.")
+    if 'world_behavior_packs.json' in js:
+        raise SystemExit("World pack activation belongs in the .mcworld package, not runtime script.");
     required_npcs = ["mara","elias","cael","sera","bram","nessa","pip","toma","lio","renn"]
     for npc_id in required_npcs:
         if f'["{npc_id}",' not in js:
