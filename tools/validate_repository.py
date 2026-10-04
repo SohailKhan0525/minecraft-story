@@ -115,6 +115,10 @@ def main() -> int:
 
     if "PROFILES =" in generator or "PROFILES = {" in generator:
         raise SystemExit("Voice identities must come from the canonical profile manifest only.")
+    package_tool = (ROOT / "tools/package_bedrock_addon.py").read_text(encoding="utf-8")
+    for required_marker in ("world_behavior_packs.json", "world_resource_packs.json", "SampleParkourWorld.mcworld", "minecraft-story-chapter-1.mcworld"):
+        if required_marker not in package_tool:
+            raise SystemExit("Bedrock release packager is missing self-activating world support.")
 
     print(f"Repository audit OK — version {version}, {len(scenes)} voice scenes, {len(speakers)} shared speakers.")
     return 0
