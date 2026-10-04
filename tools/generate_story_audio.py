@@ -40,11 +40,11 @@ PROFILES = {
     "Mira": ("en-us+f2", 165, 70),
 }
 
-SCENE_DECL = re.compile(r'(?m)^\s*(?:scene|SCENES\\.put)\\("([^"]+)"')
-LINE_DECL = re.compile(r'l\\("((?:\\\\.|[^"])*)",\\s*"((?:\\\\.|[^"])*)",')
+SCENE_DECL = re.compile(r'(?m)^\s*(?:scene|SCENES\.put)\("([^"]+)"')
+LINE_DECL = re.compile(r'l\("((?:\\\\.|[^"])*)",\s*"((?:\\\\.|[^"])*)",')
 
 def unescape_java(value: str) -> str:
-    return value.replace('\\\\', '\\\\').replace('\\\"', '"')
+    return value.replace('\\\\', '\\').replace('\\"', '"')
 
 def parse_scenes() -> list[tuple[str, list[tuple[str, str]]]]:
     source = SOURCE.read_text(encoding="utf-8")
@@ -92,7 +92,7 @@ def generate_scene(scene_id: str, lines: list[tuple[str, str]]) -> int:
             w.setnchannels(1)
             w.setsampwidth(2)
             w.setframerate(22050)
-            w.writeframes(b"\\0\\0" * int(22050 * 0.18))
+            w.writeframes(b"\0\0" * int(22050 * 0.18))
 
         parts: list[Path] = []
         for i, (speaker, text) in enumerate(lines):
