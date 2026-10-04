@@ -60,6 +60,25 @@ public final class StoryQuest {
                 new Objective("reach_river", "Reach the river.", 1),
                 new Objective("witness_lights", "Witness the four lights above Havenfall.", 1)
             );
+            case "first_star" -> List.of(
+                new Objective("reach_star_forest", "Follow the moving star into the northern forest.", 1),
+                new Objective("recover_fragment", "Recover the star fragment.", 1)
+            );
+            case "ashes" -> List.of(
+                new Objective("read_ashes", "Read the memory trapped in the chapel ash.", 1),
+                new Objective("ring_bell", "Ring the village bell and listen for the second voice.", 1)
+            );
+            case "cartographer" -> List.of(
+                new Objective("inspect_copy", "Inspect Elias's copied map.", 1),
+                new Objective("prove_lie", "Find the mark that proves the map was drawn after the fall.", 1)
+            );
+            case "four" -> List.of(
+                new Objective("open_first_gate", "Open the first star-door.", 1),
+                new Objective("hear_name", "Discover what waits beyond it.", 1)
+            );
+            case "returning" -> List.of(
+                new Objective("meet_voice", "Meet the returning voice.", 1)
+            );
             default -> List.of(new Objective("unknown", "Complete the current story objective.", 1));
         };
     }
@@ -74,6 +93,11 @@ public final class StoryQuest {
             case "knight" -> 9;
             case "heart" -> 16;
             case "night" -> 10;
+            case "first_star" -> 10;
+            case "ashes" -> 8;
+            case "cartographer" -> 12;
+            case "four" -> 15;
+            case "returning" -> 8;
             default -> 5;
         };
     }
