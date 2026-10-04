@@ -33,6 +33,11 @@ public final class StorySessionManager {
         STATES.put(playerId, new StoryState());
     }
 
+    public static void unload(ServerPlayer player) {
+        save(player);
+        STATES.remove(player.getUUID());
+    }
+
     public static void save(ServerPlayer player) {
         StoryState state = STATES.get(player.getUUID());
         MinecraftServer server = player.level().getServer();
