@@ -86,3 +86,70 @@ Mara: I don't know. Get everyone inside.
 Cael: The first one has awakened.
 Unknown Voice: No.
 Unknown Voice: The first one has returned.
+
+
+# Ambient Conversation Library
+
+## Bakery
+Bram: People think the end of the world starts with fire.
+Elias: Doesn't it?
+Bram: No. It starts when everyone forgets breakfast.
+Elias: That's your theory?
+Bram: It's the only theory that has survived three winters.
+
+## Blacksmith
+Nessa: Don't touch that.
+Villager: I was only looking.
+Nessa: Your fingers were looking too.
+Villager: Fair.
+
+## Guard Shift
+Guard One: Did you hear that?
+Guard Two: No.
+Guard One: Exactly.
+Guard Two: That's not how hearing works.
+Guard One: I know what I heard.
+
+## Children
+Pip: I saw the star fall.
+Toma: You saw a chicken fall.
+Pip: It was a very bright chicken.
+Toma: It was on fire.
+Pip: Exactly.
+
+## River
+Lio: Fish are gone.
+Wanderer: All of them?
+Lio: Not one.
+Lio: Rivers don't go quiet unless something upstream is afraid.
+
+## After the Silent Event
+Villager One: Say something.
+Villager Two: I am.
+Villager One: I can't hear you.
+Villager Two: Neither can I.
+
+## Elias and Mara
+Elias: I have a theory.
+Mara: No.
+Elias: You don't even know the theory.
+Mara: I know you.
+Elias: That's hurtful.
+Mara: Good.
+
+## Sera
+Sera: You always this quiet?
+Wanderer: Usually.
+Sera: Good. I was worried I'd have to carry the conversation too.
+
+## Combat Bark
+Elias: Behind you!
+Mara: I know.
+Elias: Then why are you walking toward it?
+Mara: Because it's walking toward me.
+
+## Hollow Knight
+Wanderer: Who are you?
+Hollow Knight: You are late.
+Wanderer: Late for what?
+Hollow Knight: Remembering.
