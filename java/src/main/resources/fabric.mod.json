@@ -11,7 +11,8 @@
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "main": ["com.minecraftstory.MinecraftStory"]
+    "main": ["com.minecraftstory.MinecraftStory"],
+    "client": ["com.minecraftstory.client.MinecraftStoryClient"]
   },
   "depends": {
     "fabricloader": ">=0.19.5",
