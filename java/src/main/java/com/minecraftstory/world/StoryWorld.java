@@ -424,7 +424,7 @@ public final class StoryWorld {
             String tag = "minecraftstory_npc:" + id;
             var matches = level.getEntitiesOfClass(Villager.class,
                     new AABB(-90, 40, -70, 90, 90, 50)).stream()
-                    .filter(v -> v.getTags().contains(tag))
+                    .filter(v -> tag.equals("minecraftstory_npc:" + npcIdFrom(v)))
                     .toList();
             for (int i = 1; i < matches.size(); i++) matches.get(i).discard();
 
@@ -442,7 +442,6 @@ public final class StoryWorld {
             villager.setCustomName(net.minecraft.network.chat.Component.literal(spec.name));
             villager.setCustomNameVisible(true);
             villager.setPersistenceRequired();
-            villager.setInvulnerable(true);
         }
     }
     private static String npcIdFrom(Villager villager) {
