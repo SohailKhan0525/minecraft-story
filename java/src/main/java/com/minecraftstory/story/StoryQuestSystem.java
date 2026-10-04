@@ -274,6 +274,12 @@ public final class StoryQuestSystem {
             spawnMemoryBoss(level, p, d);
             playerHint(p, "The Hollow Knight stops moving. Do not attack the memory. Touch the crystal when it opens.");
         }
+        if (progress >= 3 && progress < 4
+                && KNIGHT_MEMORY_SPAWNED.getOrDefault(p.getUUID(), false)
+                && !hasMemoryBoss(p)) {
+            spawnMemoryBoss(level, p, d);
+            playerHint(p, "The memory reforms. Stop attacking and touch the crystal.");
+        }
     }
 
     private static void progressHeart(ServerPlayer p, StoryState s, ServerLevel level, int progress) {
@@ -383,7 +389,6 @@ public final class StoryQuestSystem {
             mob.setHealth((float) (160.0D + difficulty.combatCount() * 45.0D));
         }
         entity.addTag("minecraftstory_hollow_knight");
-        entity.setInvulnerable(true);
         level.addFreshEntity(entity);
     }
 
