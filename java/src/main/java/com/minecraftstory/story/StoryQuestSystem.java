@@ -54,6 +54,19 @@ public final class StoryQuestSystem {
     public static void onQuestBlockInteraction(ServerPlayer player, net.minecraft.core.BlockPos pos) {
         StoryState state = StorySessionManager.state(player);
         switch (state.activeQuest()) {
+            case "Find Elias" -> {
+                if (pos.equals(new net.minecraft.core.BlockPos(25, 64, 11)) && state.questProgress() == 0) {
+                    setProgress(player, state, 1, "Elias's workshop is empty. A fresh map line points east.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(33, 64, 1)) && state.questProgress() == 1) {
+                    setProgress(player, state, 2, "A torn survey rope is still warm.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(36, 64, -6)) && state.questProgress() == 2) {
+                    setProgress(player, state, 3, "A map fragment shows a staircase that should not exist.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(35, 64, -14)) && state.questProgress() == 3) {
+                    setProgress(player, state, 4, "The trail bends into the Silent Forest.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(39, 64, -22)) && state.questProgress() == 4) {
+                    setProgress(player, state, 5, "You find Elias beside the impossible map.");
+                }
+            }
             case "Blue Fire" -> {
                 if (pos.equals(new net.minecraft.core.BlockPos(8, 65, 8)) && state.questProgress() == 1) {
                     setProgress(player, state, 2, "The first cold-blue flame answers.");
@@ -104,6 +117,12 @@ public final class StoryQuestSystem {
             case "cael" -> {
                 if ("Blue Fire".equals(state.activeQuest()) && state.questProgress() >= 4) { setProgress(player, state, 5, "Cael listens in silence."); complete(player, state, "Find Elias"); }
             }
+            case "elias" -> {
+                if ("Find Elias".equals(state.activeQuest()) && state.questProgress() >= 5) {
+                    player.sendSystemMessage(Component.literal("Elias: "You actually followed the trail.""), true);
+                    complete(player, state, "Beneath the Roots");
+                }
+            }
             case "sera" -> {
                 if ("Beneath the Roots".equals(state.activeQuest()) && state.questProgress() >= 5) {
                     player.sendSystemMessage(Component.literal("Sera is waiting. Choose whether to rescue her or follow the archive."), true);
@@ -151,14 +170,8 @@ public final class StoryQuestSystem {
     }
 
     private static void progressElias(ServerPlayer p, StoryState s, int progress) {
-        if (progress < 1 && in(p, 21, 2, 29, 11)) advance(p, s, 1, "Elias's workshop is empty.");
-        if (progress < 2 && in(p, 29, -1, 37, 7)) advance(p, s, 2, "The torn survey rope points east.");
-        if (progress < 3 && in(p, 34, -6, 40, 0)) advance(p, s, 3, "You recover a map fragment.");
-        if (progress < 4 && in(p, 34, -18, 42, -10)) advance(p, s, 4, "The impossible staircase is real.");
-        if (progress < 5 && in(p, 35, -24, 45, -16)) {
-            s.set(StoryFlag.ELIAS_FOUND);
-            complete(p, s, "Beneath the Roots");
-        }
+        // Find Elias is deliberately interaction-driven. Walking through the forest never silently completes it.
+        // Each clue must be physically inspected, and the final clue leads to Elias himself.
     }
 
     private static void progressRoots(ServerPlayer p, StoryState s, int progress) {
