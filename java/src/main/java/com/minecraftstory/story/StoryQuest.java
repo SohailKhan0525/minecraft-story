@@ -31,7 +31,8 @@ public final class StoryQuest {
                 new Objective("enter_forest", "Push through the Silent Forest.", 1),
                 new Objective("stone_markers", "Read three ancient stone markers.", 3),
                 new Objective("observatory", "Reach the buried Observatory.", 1),
-                new Objective("map_core", "Recover the Observatory map from its central table.", 1)
+                new Objective("map_core", "Recover the Observatory map from its central table.", 1),
+                new Objective("reach_sera", "Meet Sera at the edge of the Observatory.", 1)
             );
             case "door" -> List.of(
                 new Objective("ash_lens", "Recover the Ash Lens.", 1),
