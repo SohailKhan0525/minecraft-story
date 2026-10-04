@@ -17,7 +17,7 @@ public final class StorySkinGenerator {
 
     private StorySkinGenerator() {}
 
-    public static void generateAll(Path output) throws IOException {
+    public static void main(String[] args) throws Exception {\n        if (args.length != 1) throw new IllegalArgumentException("Expected output directory");\n        generateAll(Path.of(args[0]));\n    }\n\n    public static void generateAll(Path output) throws IOException {
         Files.createDirectories(output);
         Map<String, Skin> skins = Map.of(
                 "wanderer", new Skin(new Color(38, 42, 49), new Color(198, 154, 112), new Color(82, 55, 38), new Color(38, 84, 110)),
