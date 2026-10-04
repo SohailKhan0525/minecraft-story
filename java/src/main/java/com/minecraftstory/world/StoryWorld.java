@@ -406,7 +406,7 @@ public final class StoryWorld {
             }
         }
 
-        for (Map.Entry<String, NpcSpec> entry : NPCS.entrySet())
+        for (Map.Entry<String, NpcSpec> entry : NPCS.entrySet()) {
             String id = entry.getKey();
             NpcSpec spec = entry.getValue();
 
