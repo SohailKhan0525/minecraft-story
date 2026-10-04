@@ -18,7 +18,7 @@ loom {
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
 def generatedStoryResources = layout.buildDirectory.dir("generated/story-resources")
 
@@ -46,7 +46,8 @@ tasks.register("generateStorySkins") {
             pip: [0x5F3A6F, 0xE0B380, 0x4C3124, 0x5B9B71],
             toma: [0x2A516F, 0xDCB181, 0x442A1F, 0xBD9F3D],
             old_renn: [0x5B4A3D, 0xAD805C, 0x78634D, 0x495257],
-            lio: [0x25504E, 0xD4A877, 0x2F2019, 0x487A7D]
+            lio: [0x25504E, 0xD4A877, 0x2F2019, 0x487A7D],
+            mira: [0x5A426E, 0xE0B38A, 0x3A243F, 0x8A6A9A]
         ]
         skins.each { name, colors ->
             def image = new java.awt.image.BufferedImage(64, 64, java.awt.image.BufferedImage.TYPE_INT_ARGB)

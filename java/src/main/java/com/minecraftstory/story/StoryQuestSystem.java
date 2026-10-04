@@ -131,6 +131,18 @@ public final class StoryQuestSystem {
                     setProgress(player, state, 5, "Elias's impossible map is pinned beneath the roots.");
                 }
             }
+            case "The Hollow Knight" -> {
+                if (state.questProgress() == 3 && pos.equals(new net.minecraft.core.BlockPos(45, 56, 20))) {
+                    if (hasMemoryBoss(player)) {
+                        playerHint(player, "The memory cannot be defeated. Touch the Heart and let it remember.");
+                        setProgress(player, state, 4, "You touch the Heart. The memory dissolves without a fight.");
+                        KNIGHT_MEMORY_SPAWNED.remove(player.getUUID());
+                        KNIGHT_FRACTURE_SPAWNED.remove(player.getUUID());
+                        KNIGHT_SPAWNED.remove(player.getUUID());
+                        complete(player, state, "The Heart of the Observatory");
+                    }
+                }
+            }
             case "The Door Beneath the World" -> {
                 if (pos.equals(new net.minecraft.core.BlockPos(35, 55, -6)) && state.questProgress() == 0) {
                     StoryItems.give(player, StoryItems.ASH_LENS);
@@ -262,13 +274,6 @@ public final class StoryQuestSystem {
             spawnMemoryBoss(level, p, d);
             playerHint(p, "The Hollow Knight stops moving. Do not attack the memory. Touch the crystal when it opens.");
         }
-        if (progress >= 3 && progress < 4 && KNIGHT_MEMORY_SPAWNED.getOrDefault(p.getUUID(), false)
-                && noTaggedMobs(level, p, "minecraftstory_hollow_knight")) {
-            KNIGHT_MEMORY_SPAWNED.remove(p.getUUID());
-            KNIGHT_SPAWNED.remove(p.getUUID());
-            advance(p, s, 4, "The memory breaks. The Heart Chamber opens.");
-            complete(p, s, "The Heart of the Observatory");
-        }
     }
 
     private static void progressHeart(ServerPlayer p, StoryState s, ServerLevel level, int progress) {
@@ -378,6 +383,7 @@ public final class StoryQuestSystem {
             mob.setHealth((float) (160.0D + difficulty.combatCount() * 45.0D));
         }
         entity.addTag("minecraftstory_hollow_knight");
+        entity.setInvulnerable(true);
         level.addFreshEntity(entity);
     }
 
@@ -414,6 +420,14 @@ public final class StoryQuestSystem {
             if (entity instanceof Mob mob) mob.setTarget(player);
             level.addFreshEntity(entity);
         }
+    }
+
+    private static boolean hasMemoryBoss(ServerPlayer player) {
+        return player.level().getEntitiesOfClass(Mob.class,
+                new net.minecraft.world.phys.AABB(player.getX() - 24, player.getY() - 10, player.getZ() - 24,
+                        player.getX() + 24, player.getY() + 10, player.getZ() + 24))
+                .stream().anyMatch(m -> !m.isDeadOrDying() && m.getCustomName() != null
+                        && m.getCustomName().getString().equals("Memory of the Hollow Knight"));
     }
 
     private static boolean noTaggedMobs(ServerLevel level, ServerPlayer player, String tag) {

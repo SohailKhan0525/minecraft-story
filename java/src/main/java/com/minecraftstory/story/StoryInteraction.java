@@ -35,15 +35,7 @@ public final class StoryInteraction {
         if (npcId.equals("mara") && !state.activeQuest().equals("A Bell Before Breakfast")) return;
         if (npcId.equals("sera") && (!state.activeQuest().equals("Beneath the Roots") || state.questProgress() < 5)) return;
         if (npcId.equals("crystal") && (!state.activeQuest().equals("The Heart of the Observatory") || state.questProgress() < 4)) return;
-        if (npcId.equals("mira") && (!state.has(StoryFlag.CHAPTER_1_COMPLETE) || state.has(StoryFlag.POST_CREDITS_SCENE_SEEN))) return;
-        if (npcId.equals("mira") && (!state.has(StoryFlag.CHAPTER_1_COMPLETE) || state.has(StoryFlag.POST_CREDITS_SCENE_SEEN))) return;
-
-        if ("mira".equals(npcId)) {
-            state.set(StoryFlag.POST_CREDITS_SCENE_SEEN);
-            StorySessionManager.save(player);
-            StoryNetwork.cinematic(player, "TO BE CONTINUED", "Chapter 2 — Coming Soon", 240);
-            return;
-        }
+        if ("mira".equals(npcId) && (!state.has(StoryFlag.CHAPTER_1_COMPLETE) || state.has(StoryFlag.POST_CREDITS_SCENE_SEEN))) return;
 
         if ("mira".equals(npcId)) {
             state.set(StoryFlag.POST_CREDITS_SCENE_SEEN);

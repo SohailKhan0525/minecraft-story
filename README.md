@@ -47,3 +47,8 @@ See:
 - `docs/chapters/chapter-1/README.md`
 
 > This is an independent project and is not an official Minecraft product.
+
+
+## Playing the game
+
+See docs/PLAYING.md for installation and platform support.
