@@ -84,6 +84,7 @@ public final class StoryWorld {
                 player.sendSystemMessage(net.minecraft.network.chat.Component.literal(
                         "The Night the Sky Broke — follow the river toward Havenfall."
                 ), true);
+                StoryNetwork.cinematic(player, "THE NIGHT THE SKY BROKE", "Follow the river. Havenfall is ahead.", 100);
             }
         });
 
