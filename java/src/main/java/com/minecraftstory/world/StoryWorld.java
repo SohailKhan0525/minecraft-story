@@ -5,6 +5,7 @@ import com.minecraftstory.story.StoryQuestSystem;
 import com.minecraftstory.story.StorySessionManager;
 import com.minecraftstory.story.StoryFlag;
 import com.minecraftstory.story.StoryNetwork;
+import com.minecraftstory.story.StoryAmbientSystem;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -28,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class StoryWorld {
     private static final BlockPos STORY_ORIGIN = new BlockPos(0, 64, 0);
     private static final Set<ServerLevel> BUILT_LEVELS = ConcurrentHashMap.newKeySet();
+    private static long NPC_SCHEDULE_TICK;
 
     private static final Map<String, NpcSpec> NPCS = Map.of(
             "mara", new NpcSpec("Mara Vale", 20, 64, 0),
@@ -95,6 +97,8 @@ public final class StoryWorld {
                     spawnNpcs(level);
                     triggerProximityScenes(level);
                     for (ServerPlayer player : level.players()) StoryQuestSystem.tick(player);
+                    StoryAmbientSystem.tick(level);
+                    runNpcSchedules(level);
                 }
             }
         });
@@ -108,6 +112,25 @@ public final class StoryWorld {
         if (mara == null) return;
         for (ServerPlayer player : level.players()) {
             if (player.distanceToSqr(mara) <= 25.0D) StoryInteraction.openIntroduction(player);
+        }
+    }
+
+    private static void runNpcSchedules(ServerLevel level) {
+        if (++NPC_SCHEDULE_TICK % 200 != 0) return;
+        long day = level.getDayTime() % 24000L;
+        for (Villager villager : level.getEntitiesOfClass(Villager.class, new AABB(-60, 40, -50, 60, 90, 38))) {
+            String id = npcIdFrom(villager);
+            if (id.isBlank() || villager.isDeadOrDying()) continue;
+            double x = villager.getX(), y = villager.getY(), z = villager.getZ();
+            switch (id) {
+                case "mara" -> { if (day < 6000) villager.getNavigation().moveTo(18, y, 0, 0.7); else villager.getNavigation().moveTo(24, y, 2, 0.65); }
+                case "elias" -> villager.getNavigation().moveTo(24, y, 4, 0.55);
+                case "cael" -> villager.getNavigation().moveTo(10, y, 8, 0.45);
+                case "sera" -> villager.getNavigation().moveTo(38, y, -8, 0.55);
+                case "bram" -> villager.getNavigation().moveTo(28, y, 8, 0.45);
+                case "nessa" -> villager.getNavigation().moveTo(0, y, -8, 0.45);
+                default -> {}
+            }
         }
     }
 
