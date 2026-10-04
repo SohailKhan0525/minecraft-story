@@ -95,7 +95,6 @@ public final class StoryWorld {
             for (ServerLevel level : server.getAllLevels()) {
                 if (!level.players().isEmpty()) {
                     ensureWorld(level);
-                    ensureChapter2World(level);
                     spawnNpcs(level);
                     triggerProximityScenes(level);
                     for (ServerPlayer player : level.players()) StoryQuestSystem.tick(player);
@@ -339,6 +338,14 @@ public final class StoryWorld {
         for (Map.Entry<String, NpcSpec> entry : NPCS.entrySet()) {
             String id = entry.getKey();
             NpcSpec spec = entry.getValue();
+
+            if ("mira".equals(id)) {
+                boolean epilogueActive = level.players().stream().anyMatch(player -> {
+                    StoryState state = StorySessionManager.state(player);
+                    return state.has(StoryFlag.CHAPTER_1_COMPLETE) && !state.has(StoryFlag.POST_CREDITS_SCENE_SEEN);
+                });
+                if (!epilogueActive) continue;
+            }
 
             if ("elias".equals(id)) {
                 // Elias disappears from Havenfall when the quest begins, then is found at the forest trail.
