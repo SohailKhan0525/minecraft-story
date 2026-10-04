@@ -28,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class StoryWorld {
     private static final BlockPos STORY_ORIGIN = new BlockPos(0, 64, 0);
-    private static final Set<ServerLevel> BUILT_LEVELS = ConcurrentHashMap.newKeySet();
     private static long NPC_SCHEDULE_TICK;
 
     private static final Map<String, NpcSpec> NPCS = Map.of(
@@ -135,7 +134,8 @@ public final class StoryWorld {
     }
 
     private static void ensureWorld(ServerLevel level) {
-        if (!BUILT_LEVELS.add(level)) return;
+        StoryWorldSavedData saved = StoryWorldSavedData.get(level);
+        if (saved.built()) return;
 
         int ox = STORY_ORIGIN.getX();
         int oy = STORY_ORIGIN.getY();
@@ -198,6 +198,7 @@ public final class StoryWorld {
 
         // Deep chamber with a visible black-crystal focus.
         buildHeartChamber(level, 45, oy - 10, 20);
+        saved.markBuilt();
     }
 
     private static void makeChapel(ServerLevel level, int x, int y, int z) {
