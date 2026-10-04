@@ -48,3 +48,21 @@ The scene timing values are **story envelopes**, not a requirement to read every
 - Every 5–8 minutes introduces a new character beat, mystery, location, mechanic, or escalation.
 - Branches change dialogue and future state rather than simply changing one sentence.
 - Funny NPCs remain present as the story darkens, but humor never undercuts the major reveals.
+## Separate quest gameplay budget
+
+The **60-minute story/dialogue/cinematic envelope is separate from quest gameplay**. The quest layer is deliberately longer so exploration, puzzle solving, travel, and combat are not compressed into the dialogue runtime.
+
+| Quest | Gameplay target |
+|---|---:|
+| A Bell Before Breakfast | 8 min |
+| Blue Fire | 11 min |
+| Find Elias | 12 min |
+| Beneath the Roots | 13 min |
+| The Door Beneath the World | 14 min |
+| The Hollow Knight | 9 min |
+| The Heart of the Observatory | 16 min |
+| The Night Is Not Over | 10 min |
+| **Quest gameplay total** | **93 min** |
+
+Quest time is earned through multi-step objectives and real in-world traversal. Difficulty changes encounter pressure: Peaceful uses puzzle/exploration completion, Easy uses lighter combat, Normal uses the standard encounter count, and Hard adds additional enemies/waves.
+
