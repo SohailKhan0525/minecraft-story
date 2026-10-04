@@ -1,6 +1,8 @@
 package com.minecraftstory;
 
+import com.minecraftstory.story.Chapter1Content;
 import com.minecraftstory.story.Chapter1Story;
+import com.minecraftstory.story.StoryCommands;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
@@ -13,8 +15,13 @@ public final class MinecraftStory implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("Minecraft Story is loading...");
-        LOGGER.info("Chapter 1 loaded: {}", Chapter1Story.TITLE);
-        LOGGER.info("Opening quest: {}", Chapter1Story.questOrder().getFirst());
+        LOGGER.info("Chapter 1: {}", Chapter1Story.TITLE);
+        LOGGER.info("Authored dialogue lines: {}", Chapter1Content.authoredLines());
+        LOGGER.info("Dialogue target seconds: {}", Chapter1Content.dialogueSeconds());
+        LOGGER.info("NPC count: {}", Chapter1Content.npcs().size());
+        LOGGER.info("Quest count: {}", Chapter1Content.quests().size());
+
+        StoryCommands.register();
     }
 
     public static Identifier id(String path) {
