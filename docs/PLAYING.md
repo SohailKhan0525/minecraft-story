@@ -1,75 +1,120 @@
-# How to Play
+# How to Play Chapter 1 — from a clean machine
 
-## What is playable right now
+Minecraft Story is distributed as two runtimes because Minecraft Java Edition and Bedrock Edition use different mod/add-on systems. Use the instructions for the edition you actually play.
 
-The current fully implemented runtime is Minecraft Java Edition 26.3 + Fabric.
+## Java Edition — Windows, Linux, macOS
 
-Chapter 1: **The Night the Sky Broke**
+### Player install
 
-1. Wake beside the river.
-2. Follow the river to Havenfall.
-3. Meet Mara and make the first dialogue choice.
-4. Investigate the chapel's blue fire.
-5. Find Elias through the physical clue trail.
-6. Enter the Silent Forest and Observatory.
-7. Make the Sera choice.
-8. Recover the three relics and open the buried door.
-9. Survive the Hollow Knight encounter.
-10. In the Memory phase, **stop attacking and touch the Heart crystal**.
-11. Survive the Heart Chamber.
-12. Make the final crystal choice.
-13. Escape Havenfall's collapse.
-14. Watch the credits.
-15. After the credits, meet Mira.
-16. Finish the wholesome epilogue.
-17. See **TO BE CONTINUED — CHAPTER 2 COMING SOON**.
+You need:
 
-## Java Edition — PC
-
-Requirements:
 - Minecraft Java Edition 26.3
 - Java/JDK 25
-- Fabric Loader 0.19.5
+- Fabric Loader 0.19.5 for Minecraft 26.3
 - Fabric API 0.161.0+26.3
-- The built Minecraft Story JAR from java/build/libs/
+- A Minecraft Story Java build
 
-### Install
-1. Install Minecraft Java Edition 26.3.
-2. Install Java 25.
+The easiest path is to use the Java artifact produced by the repository's Audio and playable builds workflow. That build includes the Chapter 1 generated voice resources inside the mod JAR.
+
+1. Install Minecraft Java Edition 26.3 and launch it once.
+2. Install Java/JDK 25.
 3. Install Fabric Loader 0.19.5 for Minecraft 26.3.
-4. Install Fabric API 0.161.0+26.3 into the same mods folder.
-5. Put the Minecraft Story JAR into that mods folder.
-6. Start the Fabric 26.3 profile.
-7. Create a **new world** for the story.
-8. Enter the world and follow the on-screen objective.
+4. Put Fabric API 0.161.0+26.3 in the same .minecraft/mods folder.
+5. Put the Minecraft Story JAR in that same mods folder.
+6. Launch the Fabric 26.3 profile.
+7. Create a new single-player world.
+8. Leave Minecraft Master/Player/Voice audio audible.
+9. Walk toward Havenfall and follow the quest HUD.
 
-## Building it yourself
+### Build it yourself
 
-    cd java
-    gradle build
+From the repository root:
 
-The JAR is produced in java/build/libs/.
+~~~bash
+sudo apt-get install espeak ffmpeg
+cd java
+../tools/generate_story_audio.py
+gradle build --stacktrace --warning-mode all
+~~~
 
-## Android / iOS / console
+On Windows, install eSpeak and FFmpeg through your preferred package manager, then run:
 
-There is not one Java JAR that can honestly run natively on every Minecraft device.
-- Android/iOS/console Minecraft is normally Bedrock Edition.
-- Java Edition and Bedrock Edition use different mod/add-on systems.
-- Android can sometimes run Java through third-party launchers, but that is not the supported release path.
-- Bedrock add-ons can be distributed to Windows, Android, iOS and supported console/Realm setups.
+~~~powershell
+python tools/generate_story_audio.py
+cd java
+gradle build --stacktrace --warning-mode all
+~~~
 
-Do not install the Java JAR into Bedrock; it will not work.
+The generated Java voice files are written to:
 
-## Bedrock status
+java/src/main/resources/assets/minecraftstory/sounds/voice/
 
-Bedrock parity is a separate engineering target. The story specification is platform-neutral so the same Chapter 1 can be reproduced in a Bedrock behavior/resource pack.
+and are included in the built JAR.
+
+### Java voice fallback
+
+When a generated audio resource is missing, the mod can fall back to the Minecraft narrator/OS speech for the opening line of a conversation. That fallback is not a recorded actor.
+
+## Bedrock Edition — Windows, Android, iPhone/iPad and supported console workflows
+
+Bedrock uses a behavior pack and a resource pack. The repository contains both.
+
+### Easiest install
+
+Use the minecraft-story-chapter-1.mcaddon artifact from the repository's Audio and playable builds workflow.
+
+1. Download the .mcaddon artifact.
+2. Open it with Minecraft Bedrock.
+3. Wait for the import to finish.
+4. Create a new world.
+5. Edit the world before entering it.
+6. In Behavior Packs, activate Minecraft Story — The Night the Sky Broke.
+7. In Resource Packs, activate Minecraft Story — Chapter 1 Voice Pack.
+8. Make sure game audio is audible.
+9. Enter the world and follow the on-screen objective.
+
+The story voice performances are player-local. Bedrock's Player.playSound API is designed for sound that only the specific player hears.
+
+### Console note
+
+Xbox, PlayStation and Switch support depends on the Bedrock distribution/workflow available on that device. The repository does not claim that a Java JAR can be installed on a console, and it does not claim that a GitHub download bypasses console content restrictions.
+
+## First-run controls
+
+No keyboard-specific story controls are required.
+
+- Java: normal movement, interaction, inventory and mouse/keyboard controls.
+- Bedrock/mobile: normal touch and controller controls.
+- Story decisions appear as buttons/forms or dialogue choices.
+
+## Chapter 1 path
+
+1. Cold open and river awakening.
+2. Havenfall and Mara's first choice.
+3. Blue fire in the chapel.
+4. The missing sound and Elias.
+5. Silent Forest and Sera.
+6. Observatory revelations.
+7. Rescue-Sera or archive choice.
+8. Three relics and the buried door.
+9. Hollow Knight encounter.
+10. Memory phase: do not try to defeat the memory; interact with the Heart.
+11. Heart Chamber defenses.
+12. Final crystal choice.
+13. Ending, credits and Mira epilogue.
+14. TO BE CONTINUED — CHAPTER 2 COMING SOON.
 
 ## Troubleshooting
 
-- Use a fresh world if the story area looks wrong.
-- Progress is stored per player.
-- If the mod does not load, verify Minecraft 26.3, JDK 25, Fabric Loader 0.19.5, Fabric API 0.161.0+26.3, and remove duplicate JARs.
+If voices are missing:
 
-## Development reality
+- Java: confirm the generated voice resources are inside the JAR, or run the generator before building.
+- Bedrock: confirm both the behavior pack and Chapter 1 Voice Pack resource pack are active.
+- Check Minecraft audio sliders and the OS output device.
+- After major story-system updates, use a new world.
 
-A successful source build is not the same thing as full runtime certification. Test the actual Minecraft 26.3 client/server before calling a release production-ready.
+## Important
+
+There is no single universal Minecraft file. A Fabric JAR is for Java Edition; a Bedrock add-on is for Bedrock Edition.
+
+Chapter 2 remains a coming-soon endpoint after the Chapter 1 ending. It is not automatically started by the Chapter 1 release.
