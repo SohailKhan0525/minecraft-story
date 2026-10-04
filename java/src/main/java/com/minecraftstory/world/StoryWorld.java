@@ -8,6 +8,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -42,11 +44,7 @@ public final class StoryWorld {
             if (level.isClientSide() || !(player instanceof ServerPlayer serverPlayer) || !(entity instanceof Villager villager)) {
                 return InteractionResult.PASS;
             }
-            String npcId = villager.getTags().stream()
-                    .filter(tag -> tag.startsWith("minecraftstory_npc:"))
-                    .findFirst()
-                    .map(tag -> tag.substring("minecraftstory_npc:".length()))
-                    .orElse("");
+            String npcId = npcIdFrom(villager);
             if (npcId.isBlank()) return InteractionResult.PASS;
 
             String scene = switch (npcId) {
@@ -63,7 +61,7 @@ public final class StoryWorld {
 
         ServerPlayerEvents.JOIN.register(player -> {
             StorySessionManager.state(player);
-            ServerLevel level = player.serverLevel();
+            ServerLevel level = player.level();
             ensureWorld(level);
             spawnNpcs(level);
 
@@ -74,7 +72,7 @@ public final class StoryWorld {
                 player.setXRot(0.0F);
                 state.set(StoryFlag.PLAYER_PLACED);
                 StorySessionManager.save(player);
-                player.displayClientMessage(net.minecraft.network.chat.Component.literal(
+                player.sendSystemMessage(net.minecraft.network.chat.Component.literal(
                         "The Night the Sky Broke — follow the river toward Havenfall."
                 ), true);
             }
@@ -95,7 +93,7 @@ public final class StoryWorld {
     private static void triggerProximityScenes(ServerLevel level) {
         Villager mara = level.getEntitiesOfClass(Villager.class,
                 new AABB(17, 63, -3, 23, 68, 3)).stream()
-                .filter(v -> v.getTags().contains("minecraftstory_npc:mara"))
+                .filter(v -> "Mara Vale".equals(v.getCustomName() == null ? "" : v.getCustomName().getString()))
                 .findFirst().orElse(null);
         if (mara == null) return;
         for (ServerPlayer player : level.players()) {
@@ -124,8 +122,8 @@ public final class StoryWorld {
         fill(level, new BlockPos(-4, oy, 28), new BlockPos(4, oy, 33), Blocks.OAK_PLANKS.defaultBlockState());
 
         // Village roads and buildings.
-        fill(level, new BlockPos(-30, oy, -2), new BlockPos(30, oy, 2), Blocks.PATH_BLOCK.defaultBlockState());
-        fill(level, new BlockPos(-2, oy, -27), new BlockPos(2, oy, 27), Blocks.PATH_BLOCK.defaultBlockState());
+        fill(level, new BlockPos(-30, oy, -2), new BlockPos(30, oy, 2), Blocks.DIRT_PATH.defaultBlockState());
+        fill(level, new BlockPos(-2, oy, -27), new BlockPos(2, oy, 27), Blocks.DIRT_PATH.defaultBlockState());
         buildHouse(level, 8, oy, 8, 9, 7, Blocks.STONE_BRICKS.defaultBlockState(), Blocks.DARK_OAK_PLANKS.defaultBlockState());
         buildHouse(level, 24, oy, 6, 9, 7, Blocks.BRICKS.defaultBlockState(), Blocks.OAK_PLANKS.defaultBlockState());
         buildHouse(level, 0, oy, -8, 9, 7, Blocks.COBBLESTONE.defaultBlockState(), Blocks.SPRUCE_PLANKS.defaultBlockState());
@@ -266,14 +264,10 @@ public final class StoryWorld {
             boolean exists = level.getEntitiesOfClass(Villager.class,
                     new AABB(spec.x - 2, spec.y - 1, spec.z - 2, spec.x + 2, spec.y + 3, spec.z + 2))
                     .stream()
-                    .anyMatch(v -> id.equals(v.getTags().stream()
-                            .filter(tag -> tag.startsWith("minecraftstory_npc:"))
-                            .findFirst()
-                            .map(tag -> tag.substring("minecraftstory_npc:".length()))
-                            .orElse("")));
+                    .anyMatch(v -> id.equals(npcIdFrom(v)));
             if (exists) continue;
 
-            Villager villager = EntityType.VILLAGER.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            Villager villager = (Villager) BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "villager")).create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             if (villager == null) continue;
             villager.setPos(spec.x + 0.5, spec.y, spec.z + 0.5);
             villager.setCustomName(net.minecraft.network.chat.Component.literal(spec.name));
@@ -281,6 +275,15 @@ public final class StoryWorld {
             villager.addTag("minecraftstory_npc:" + id);
             level.addFreshEntity(villager);
         }
+    }
+
+    private static String npcIdFrom(Villager villager) {
+        String name = villager.getCustomName() == null ? "" : villager.getCustomName().getString();
+        return NPCS.entrySet().stream()
+                .filter(entry -> entry.getValue().name.equals(name))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse("");
     }
 
     private record NpcSpec(String name, int x, int y, int z) {}
