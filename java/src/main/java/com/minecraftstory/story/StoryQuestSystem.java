@@ -49,6 +49,39 @@ public final class StoryQuestSystem {
         }
     }
 
+    public static void onNpcInteraction(ServerPlayer player, String npcId) {
+        StoryState state = StorySessionManager.state(player);
+        switch (npcId) {
+            case "mara" -> {
+                if ("A Bell Before Breakfast".equals(state.activeQuest()) &&
+                        state.questProgress() >= 1) complete(player, state, "Blue Fire");
+            }
+            case "cael" -> {
+                if ("Blue Fire".equals(state.activeQuest()) && state.questProgress() >= 4) complete(player, state, "Find Elias");
+            }
+            case "sera" -> {
+                if ("Beneath the Roots".equals(state.activeQuest()) && state.questProgress() >= 5) {
+                    player.displayClientMessage(Component.literal("Sera is waiting. Choose whether to rescue her or follow the archive."), true);
+                }
+            }
+            case "crystal" -> {
+                if ("The Heart of the Observatory".equals(state.activeQuest()) && state.questProgress() >= 4) {
+                    player.displayClientMessage(Component.literal("The crystal is waiting for your decision."), true);
+                }
+            }
+            default -> {}
+        }
+    }
+
+    public static void resolveChoice(ServerPlayer player, String npcId) {
+        StoryState state = StorySessionManager.state(player);
+        if ("sera".equals(npcId) && "Beneath the Roots".equals(state.activeQuest()) && state.questProgress() >= 5) {
+            complete(player, state, "The Door Beneath the World");
+        } else if ("crystal".equals(npcId) && "The Heart of the Observatory".equals(state.activeQuest()) && state.questProgress() >= 4) {
+            complete(player, state, "The Night Is Not Over");
+        }
+    }
+
     public static DifficultyProfile difficulty(ServerLevel level) {
         return switch (level.getDifficulty()) {
             case PEACEFUL -> new DifficultyProfile(0, 0, true);
@@ -114,7 +147,7 @@ public final class StoryQuestSystem {
             spawnGuardians(level, p, d.combatCount());
             advance(p, s, 2, "Survive the guardian assault.");
         }
-        if (progress >= 2 && noTaggedMobs(level, p, "minecraftstory_hollow_knight")) {
+        if (progress >= 2 && in(p, 36, 3, 52, 20) && noTaggedMobs(level, p, "minecraftstory_hollow_knight")) {
             advance(p, s, 3, "The guardian falls silent.");
             complete(p, s, "The Heart of the Observatory");
         }
@@ -134,7 +167,7 @@ public final class StoryQuestSystem {
             advance(p, s, 4, "The black crystal is exposed.");
         }
         if (progress >= 4 && in(p, 42, 17, 48, 23)) {
-            complete(p, s, "The Night Is Not Over");
+            p.displayClientMessage(Component.literal("The black crystal is exposed. Interact with it to choose its fate."), true);
         }
     }
 
