@@ -8,6 +8,7 @@ public final class StoryInteraction {
 
     public static void open(ServerPlayer player, String npcId, String sceneId) {
         StorySessionManager.state(player);
+        StoryQuestSystem.onNpcInteraction(player, npcId);
         ServerPlayNetworking.send(player, new StoryNetwork.OpenDialogue(npcId, sceneId));
     }
 
@@ -26,11 +27,11 @@ public final class StoryInteraction {
             case "mara:light_yes" -> { Chapter1Story.chooseIntroduction(state, "saw_the_light"); state.setActiveQuest("Blue Fire"); }
             case "mara:light_no" -> { Chapter1Story.chooseIntroduction(state, "memory_missing"); state.setActiveQuest("Blue Fire"); }
             case "mara:light_unsure" -> { Chapter1Story.chooseIntroduction(state, "deny_light"); state.setActiveQuest("Blue Fire"); }
-            case "sera:mercy" -> { Chapter1Story.chooseObservatoryPath(state, true); state.setActiveQuest("The Door Beneath the World"); }
-            case "sera:knowledge" -> { Chapter1Story.chooseObservatoryPath(state, false); state.setActiveQuest("The Door Beneath the World"); }
-            case "crystal:seal" -> { Chapter1Story.chooseCrystalEnding(state, "seal"); state.setActiveQuest("The Night Is Not Over"); }
-            case "crystal:touch" -> { Chapter1Story.chooseCrystalEnding(state, "touch"); state.setActiveQuest("The Night Is Not Over"); }
-            case "crystal:destroy" -> { Chapter1Story.chooseCrystalEnding(state, "destroy"); state.setActiveQuest("The Night Is Not Over"); }
+            case "sera:mercy" -> { Chapter1Story.chooseObservatoryPath(state, true); StoryQuestSystem.resolveChoice(player, "sera"); }
+            case "sera:knowledge" -> { Chapter1Story.chooseObservatoryPath(state, false); StoryQuestSystem.resolveChoice(player, "sera"); }
+            case "crystal:seal" -> { Chapter1Story.chooseCrystalEnding(state, "seal"); StoryQuestSystem.resolveChoice(player, "crystal"); }
+            case "crystal:touch" -> { Chapter1Story.chooseCrystalEnding(state, "touch"); StoryQuestSystem.resolveChoice(player, "crystal"); }
+            case "crystal:destroy" -> { Chapter1Story.chooseCrystalEnding(state, "destroy"); StoryQuestSystem.resolveChoice(player, "crystal"); }
             default -> { return; }
         }
 
