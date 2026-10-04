@@ -20,7 +20,25 @@ dependencies {
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
+def generatedStoryResources = layout.buildDirectory.dir("generated/story-resources")
+
+sourceSets {
+    main {
+        resources {
+            srcDir(generatedStoryResources)
+        }
+    }
+}
+
+tasks.register("generateStorySkins", JavaExec) {
+    dependsOn(tasks.named("classes"))
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "com.minecraftstory.assets.StorySkinGenerator"
+    args(generatedStoryResources.map { it.dir("assets/minecraftstory/textures/entity/skin").asFile.absolutePath })
+}
+
 processResources {
+    dependsOn(tasks.named("generateStorySkins"))
     def version = project.version
     inputs.property "version", version
     filesMatching("fabric.mod.json") {
