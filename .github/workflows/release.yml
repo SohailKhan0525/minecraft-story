@@ -236,6 +236,7 @@ jobs:
           JAVA_JAR=$(find java/build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' -print -quit)
           test -n "$JAVA_JAR"
           cp "$JAVA_JAR" "release/minecraft-story-java-${{ needs.prepare.outputs.version }}.jar"
+          cp dist/minecraft-story-chapter-1.mcworld "release/minecraft-story-bedrock-world-${{ needs.prepare.outputs.version }}.mcworld"
           cp dist/minecraft-story-chapter-1.mcaddon "release/minecraft-story-bedrock-${{ needs.prepare.outputs.version }}.mcaddon"
           cp dist/minecraft-story-behavior.mcpack "release/minecraft-story-behavior-${{ needs.prepare.outputs.version }}.mcpack"
           cp dist/minecraft-story-resources.mcpack "release/minecraft-story-resources-${{ needs.prepare.outputs.version }}.mcpack"
@@ -268,7 +269,7 @@ jobs:
 
             **The Night the Sky Broke**
 
-            Download the Java `.jar` or the Bedrock `.mcaddon`. Individual Bedrock `.mcpack` files are also included as a fallback for devices that need separate pack imports. Voices are bundled; no separate voice download is required.
+            Download the Java `.jar`, or use the ready-to-play `.mcworld` for Bedrock. Individual Bedrock `.mcpack` files are also included as a fallback for devices that need separate pack imports. Voices are bundled; no separate voice download is required.
 
             The release is published only after Java builds pass on Ubuntu, Windows and macOS; Bedrock validation passes on Ubuntu, Windows and macOS; and the shared cross-chapter voice assets pass generation and validation.
 
