@@ -138,12 +138,13 @@ public final class StoryWorld {
         // Chapel with three physical cold-blue flame investigation points.
         makeChapel(level, 5, oy + 1, 5);
 
-        // Workshop clues and east-road trail.
-        for (int x = 21; x <= 29; x += 2) {
-            makeMarker(level, x, oy, 11, Blocks.OAK_PLANKS.defaultBlockState());
-        }
-        fill(level, new BlockPos(29, oy, -1), new BlockPos(37, oy, 1), Blocks.GRAVEL.defaultBlockState());
+        // Elias trail: five distinct physical clues, spread from the empty workshop into the forest.
+        makeMarker(level, 25, oy, 11, Blocks.OAK_PLANKS.defaultBlockState());
+        makeMarker(level, 33, oy, 1, Blocks.TRIPWIRE_HOOK.defaultBlockState());
         makeMarker(level, 36, oy, -6, Blocks.COBBLED_DEEPSLATE.defaultBlockState());
+        makeMarker(level, 35, oy, -14, Blocks.POLISHED_BLACKSTONE.defaultBlockState());
+        makeMarker(level, 39, oy, -22, Blocks.CARTOGRAPHY_TABLE.defaultBlockState());
+        fill(level, new BlockPos(29, oy, -1), new BlockPos(37, oy, 1), Blocks.GRAVEL.defaultBlockState());
         makeMarker(level, 35, oy - 10, -6, Blocks.GOLD_BLOCK.defaultBlockState());
         makeMarker(level, 41, oy - 10, -4, Blocks.IRON_BLOCK.defaultBlockState());
         makeMarker(level, 45, oy - 10, 0, Blocks.CRYING_OBSIDIAN.defaultBlockState());
@@ -270,9 +271,42 @@ public final class StoryWorld {
     }
 
     private static void spawnNpcs(ServerLevel level) {
+        boolean findEliasActive = level.players().stream()
+                .anyMatch(player -> "Find Elias".equals(StorySessionManager.state(player).activeQuest()));
+
         for (Map.Entry<String, NpcSpec> entry : NPCS.entrySet()) {
             String id = entry.getKey();
             NpcSpec spec = entry.getValue();
+
+            if ("elias".equals(id)) {
+                // Elias disappears from Havenfall when the quest begins, then is found at the forest trail.
+                String desiredName = spec.name;
+                double targetX = findEliasActive ? 39.5D : spec.x + 0.5D;
+                double targetY = spec.y;
+                double targetZ = findEliasActive ? -22.5D : spec.z + 0.5D;
+                level.getEntitiesOfClass(Villager.class,
+                                new AABB(-80, 40, -60, 80, 90, 40))
+                        .stream()
+                        .filter(v -> desiredName.equals(v.getCustomName() == null ? "" : v.getCustomName().getString()))
+                        .filter(v -> Math.abs(v.getX() - targetX) > 3.0D || Math.abs(v.getZ() - targetZ) > 3.0D)
+                        .forEach(Villager::discard);
+
+                boolean exists = level.getEntitiesOfClass(Villager.class,
+                        new AABB(targetX - 2, targetY - 1, targetZ - 2, targetX + 2, targetY + 3, targetZ + 2))
+                        .stream().anyMatch(v -> desiredName.equals(v.getCustomName() == null ? "" : v.getCustomName().getString()));
+                if (exists) continue;
+
+                Villager villager = (Villager) BuiltInRegistries.ENTITY_TYPE.getValue(
+                        Identifier.fromNamespaceAndPath("minecraft", "villager"))
+                        .create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+                if (villager == null) continue;
+                villager.setPos(targetX, targetY, targetZ);
+                villager.setCustomName(net.minecraft.network.chat.Component.literal(desiredName));
+                villager.setCustomNameVisible(true);
+                villager.addTag("minecraftstory_npc:elias");
+                level.addFreshEntity(villager);
+                continue;
+            }
             boolean exists = level.getEntitiesOfClass(Villager.class,
                     new AABB(spec.x - 2, spec.y - 1, spec.z - 2, spec.x + 2, spec.y + 3, spec.z + 2))
                     .stream()
