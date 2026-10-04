@@ -44,6 +44,7 @@ public final class StoryQuest {
             case "knight" -> List.of(
                 new Objective("guardian", "Face the Hollow Knight.", 1),
                 new Objective("break_guard", "Survive the guardian's first assault.", 1),
+                new Objective("fracture", "Survive the Hollow Knight's fracture.", 1),
                 new Objective("defeat_guard", "Defeat the Hollow Knight.", 1)
             );
             case "heart" -> List.of(
