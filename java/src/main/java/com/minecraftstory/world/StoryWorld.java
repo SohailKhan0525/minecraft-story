@@ -38,7 +38,6 @@ public final class StoryWorld {
             "sera", new NpcSpec("Sera Voss", 38, 64, -8),
             "bram", new NpcSpec("Bram the Baker", 28, 64, 8),
             "nessa", new NpcSpec("Nessa the Blacksmith", 0, 64, -8),
-            "crystal", new NpcSpec("Black Crystal", 45, 54, 20),
             "mira", new NpcSpec("Mira", 18, 64, -4)
     );
 
@@ -401,7 +400,13 @@ public final class StoryWorld {
         boolean findEliasActive = level.players().stream()
                 .anyMatch(player -> "Find Elias".equals(StorySessionManager.state(player).activeQuest()));
 
-        for (Map.Entry<String, NpcSpec> entry : NPCS.entrySet()) {
+        for (Villager oldCrystal : level.getEntitiesOfClass(Villager.class, new AABB(34, 45, 14, 52, 62, 26))) {
+            if ("Black Crystal".equals(oldCrystal.getCustomName() == null ? "" : oldCrystal.getCustomName().getString())) {
+                oldCrystal.discard();
+            }
+        }
+
+        for (Map.Entry<String, NpcSpec> entry : NPCS.entrySet())
             String id = entry.getKey();
             NpcSpec spec = entry.getValue();
 
@@ -424,7 +429,7 @@ public final class StoryWorld {
             String tag = "minecraftstory_npc:" + id;
             var matches = level.getEntitiesOfClass(Villager.class,
                     new AABB(-90, 40, -70, 90, 90, 50)).stream()
-                    .filter(v -> tag.equals("minecraftstory_npc:" + npcIdFrom(v)))
+.filter(v -> v.getTags().contains(tag))
                     .toList();
             for (int i = 1; i < matches.size(); i++) matches.get(i).discard();
 
@@ -436,12 +441,14 @@ public final class StoryWorld {
                 if (villager == null) continue;
                 villager.addTag(tag);
                 level.addFreshEntity(villager);
+                villager.setGlowingTag(true);
             }
 
             villager.setPos(targetX, targetY, targetZ);
             villager.setCustomName(net.minecraft.network.chat.Component.literal(spec.name));
             villager.setCustomNameVisible(true);
             villager.setPersistenceRequired();
+            villager.setGlowingTag(true);
         }
     }
     private static String npcIdFrom(Villager villager) {
