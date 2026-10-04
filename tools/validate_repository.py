@@ -95,11 +95,15 @@ def main() -> int:
         raise SystemExit("Audio generator is not using the shared cross-chapter voice profile source.")
 
     release = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
-    if "latest published release" not in release or "gh api" not in release or "bump" not in release:
+    lower_release = release.lower()
+    if "latest published stable version" not in lower_release or "gh api" not in lower_release or "semver" not in lower_release:
         raise SystemExit("Release workflow does not contain dynamic semantic-version detection.")
 
     if not (ROOT / ".gitignore").read_text(encoding="utf-8").count("dist/"):
         raise SystemExit(".gitignore must exclude generated dist/ release packaging output.")
+
+    if "PROFILES =" in generator or "PROFILES = {" in generator:
+        raise SystemExit("Voice identities must come from the canonical profile manifest only.")
 
     print(f"Repository audit OK — version {version}, {len(scenes)} voice scenes, {len(speakers)} shared speakers.")
     return 0
