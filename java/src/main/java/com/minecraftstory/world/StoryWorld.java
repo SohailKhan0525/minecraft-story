@@ -37,7 +37,8 @@ public final class StoryWorld {
             "sera", new NpcSpec("Sera Voss", 38, 64, -8),
             "bram", new NpcSpec("Bram the Baker", 28, 64, 8),
             "nessa", new NpcSpec("Nessa the Blacksmith", 0, 64, -8),
-            "crystal", new NpcSpec("Black Crystal", 45, 54, 20)
+            "crystal", new NpcSpec("Black Crystal", 45, 54, 20),
+            "mira", new NpcSpec("Mira", 18, 64, -4)
     );
 
     private StoryWorld() {}
@@ -62,6 +63,7 @@ public final class StoryWorld {
                 case "cael" -> "chapel";
                 case "sera" -> "first_choice";
                 case "crystal" -> "heart";
+                case "mira" -> "post_credits";
                 default -> "havenfall";
             };
             StoryInteraction.open(serverPlayer, npcId, scene);

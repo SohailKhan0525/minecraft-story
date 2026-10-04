@@ -41,6 +41,7 @@ public final class DialogueScreen extends Screen {
                     case "seal" -> "Seal the crystal.";
                     case "touch" -> "Touch the crystal.";
                     case "destroy" -> "Try to destroy it.";
+                    case "continue" -> "Stay a little longer.";
                     default -> choice;
                 };
                 this.addRenderableWidget(Button.builder(Component.literal(label), b -> choose(choice))
@@ -53,7 +54,7 @@ public final class DialogueScreen extends Screen {
     }
 
     private boolean hasChoice() {
-        return npcId.equals("mara") || npcId.equals("sera") || npcId.equals("crystal");
+        return npcId.equals("mara") || npcId.equals("sera") || npcId.equals("crystal") || npcId.equals("mira");
     }
 
     private String[] choices() {
@@ -61,6 +62,7 @@ public final class DialogueScreen extends Screen {
             case "mara" -> new String[]{"light_yes", "light_no", "light_unsure"};
             case "sera" -> new String[]{"mercy", "knowledge"};
             case "crystal" -> new String[]{"seal", "touch", "destroy"};
+            case "mira" -> new String[]{"continue"};
             default -> new String[0];
         };
     }

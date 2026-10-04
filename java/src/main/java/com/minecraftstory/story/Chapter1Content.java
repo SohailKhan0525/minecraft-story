@@ -230,6 +230,19 @@ public final class Chapter1Content {
         return s;
     }
 
+        SCENES.put("post_credits", new Scene("post_credits", "After the Credits", 220, List.of(
+            l("Mira", "You know, for someone who fell out of the sky, you are surprisingly bad at introductions.", "teasing"),
+            l("Wanderer", "I was distracted.", "warm"),
+            l("Mira", "By the mysterious mountain? The impossible stars? The terrifying ancient crystal?", "playful"),
+            l("Wanderer", "Mostly by you laughing at me.", "teasing"),
+            l("Mira", "Good. I was hoping you'd notice.", "warm"),
+            l("Wanderer", "Do you always talk to strangers like this?", "curious"),
+            l("Mira", "Only the interesting ones.", "soft"),
+            l("Wanderer", "Then I suppose I should stay a stranger a little longer.", "smiling"),
+            l("Mira", "Please do. I have questions. And maybe coffee.", "laughing"),
+            l("Wanderer", "That sounds dangerous.", "playful"),
+            l("Mira", "So does following you into the mountains.", "warm")
+        )));
     public static List<Scene> scenes() { return List.copyOf(SCENES.values()); }
     public static int authoredLines() { return SCENES.values().stream().mapToInt(s -> s.lines().size()).sum(); }
     public static int dialogueSeconds() { return SCENES.values().stream().mapToInt(Scene::targetSeconds).sum(); }
