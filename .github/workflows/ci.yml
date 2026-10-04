@@ -63,5 +63,9 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y espeak ffmpeg
       - name: Generate voices
         run: python tools/generate_story_audio.py
+      - name: Validate repository consistency
+        run: python tools/validate_repository.py
+      - name: Generate voices
+        run: python tools/generate_story_audio.py
       - name: Validate voices
         run: python tools/validate_voice_assets.py
