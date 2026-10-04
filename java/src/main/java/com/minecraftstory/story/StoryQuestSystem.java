@@ -51,6 +51,42 @@ public final class StoryQuestSystem {
         }
     }
 
+    public static void onQuestBlockInteraction(ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        StoryState state = StorySessionManager.state(player);
+        switch (state.activeQuest()) {
+            case "Blue Fire" -> {
+                if (pos.equals(new net.minecraft.core.BlockPos(8, 65, 8)) && state.questProgress() == 1) {
+                    setProgress(player, state, 2, "The first cold-blue flame answers.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(12, 65, 8)) && state.questProgress() == 2) {
+                    setProgress(player, state, 3, "The second flame whispers a name.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(8, 65, 12)) && state.questProgress() == 3) {
+                    setProgress(player, state, 4, "The third flame points underground.");
+                }
+            }
+            case "Beneath the Roots" -> {
+                if (pos.equals(new net.minecraft.core.BlockPos(32, 64, -25)) && state.questProgress() == 1) {
+                    setProgress(player, state, 2, "The first marker reveals a broken sky.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(37, 64, -16)) && state.questProgress() == 2) {
+                    setProgress(player, state, 3, "The second marker names eleven kneeling figures.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(41, 64, -9)) && state.questProgress() == 3) {
+                    setProgress(player, state, 4, "The third marker leaves one figure standing.");
+                }
+            }
+            case "The Door Beneath the World" -> {
+                if (pos.equals(new net.minecraft.core.BlockPos(35, 55, -6)) && state.questProgress() == 0) {
+                    setProgress(player, state, 1, "Ash Lens recovered.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(41, 55, -4)) && state.questProgress() == 1) {
+                    setProgress(player, state, 2, "Star-Iron Shard recovered.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(45, 55, 0)) && state.questProgress() == 2) {
+                    setProgress(player, state, 3, "Warden Seal recovered.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(42, 56, -4)) && state.questProgress() == 3) {
+                    setProgress(player, state, 4, "The Observatory ring mechanism aligns.");
+                }
+            }
+            default -> {}
+        }
+    }
+
     public static void onNpcInteraction(ServerPlayer player, String npcId) {
         StoryState state = StorySessionManager.state(player);
         switch (npcId) {
@@ -108,12 +144,6 @@ public final class StoryQuestSystem {
 
     private static void progressBlueFire(ServerPlayer p, StoryState s, int progress) {
         if (progress < 1 && in(p, 5, 5, 15, 15)) advance(p, s, 1, "Chapel reached.");
-        if (progress < 4) {
-            if (in(p, 7, 7, 9, 9)) progress = maxProgress(p, s, 2, "The blue flame feels colder up close.");
-            if (in(p, 11, 7, 13, 9)) progress = maxProgress(p, s, 3, "The second flame whispers.");
-            if (in(p, 7, 11, 9, 13)) progress = maxProgress(p, s, 4, "The third flame answers from underground.");
-        }
-
     }
 
     private static void progressElias(ServerPlayer p, StoryState s, int progress) {
@@ -129,17 +159,10 @@ public final class StoryQuestSystem {
 
     private static void progressRoots(ServerPlayer p, StoryState s, int progress) {
         if (progress < 1 && in(p, 27, -32, 43, -5)) advance(p, s, 1, "The Silent Forest swallows the road.");
-        if (in(p, 30, -28, 34, -23)) maxProgress(p, s, 2, "Ancient stone: THE SKY WAS BROKEN HERE.");
-        if (in(p, 35, -19, 39, -14)) maxProgress(p, s, 3, "Ancient stone: ELEVEN KNEELED.");
-        if (in(p, 39, -12, 43, -7)) maxProgress(p, s, 4, "Ancient stone: ONE REMAINED.");
-        if (progress < 5 && in(p, 33, -25, 43, -15)) advance(p, s, 5, "The buried Observatory is ahead.");
+        if (progress >= 4 && progress < 5 && in(p, 33, -25, 43, -15)) advance(p, s, 5, "The buried Observatory is ahead.");
     }
 
     private static void progressDoor(ServerPlayer p, StoryState s, int progress) {
-        if (progress < 1 && in(p, 34, -8, 38, -4)) advance(p, s, 1, "Ash Lens recovered.");
-        if (progress < 2 && in(p, 39, -7, 43, -3)) advance(p, s, 2, "Star-Iron Shard recovered.");
-        if (progress < 3 && in(p, 42, -4, 46, 0)) advance(p, s, 3, "Warden Seal recovered.");
-        if (progress < 4 && in(p, 36, 0, 44, 6)) advance(p, s, 4, "The ring mechanism aligns.");
         if (progress >= 4 && in(p, 38, 5, 46, 11)) complete(p, s, "The Hollow Knight");
     }
 
