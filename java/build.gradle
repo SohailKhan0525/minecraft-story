@@ -30,11 +30,56 @@ sourceSets {
     }
 }
 
-tasks.register("generateStorySkins", JavaExec) {
-    dependsOn(tasks.named("classes"))
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = "com.minecraftstory.assets.StorySkinGenerator"
-    args(generatedStoryResources.map { it.dir("assets/minecraftstory/textures/entity/skin").asFile.absolutePath })
+tasks.register("generateStorySkins") {
+    outputs.dir(generatedStoryResources)
+    doLast {
+        def out = generatedStoryResources.get().dir("assets/minecraftstory/textures/entity/skin").asFile
+        out.mkdirs()
+        def skins = [
+            wanderer: [0x263039, 0xC69A70, 0x523726, 0x26546E],
+            mara: [0x3D4248, 0xB88A63, 0x5A2D1F, 0x475665],
+            elias: [0x714E32, 0xDBAE7E, 0x352219, 0x376748],
+            cael: [0x35353A, 0xCAA073, 0x604931, 0x5C5C62],
+            sera: [0x2B3038, 0xCDA070, 0x39221C, 0x704930],
+            bram: [0x76492A, 0xD3A574, 0x4C2D1A, 0xA7702F],
+            nessa: [0x303439, 0xBF9167, 0x271C18, 0x666D74],
+            pip: [0x5F3A6F, 0xE0B380, 0x4C3124, 0x5B9B71],
+            toma: [0x2A516F, 0xDCB181, 0x442A1F, 0xBD9F3D],
+            old_renn: [0x5B4A3D, 0xAD805C, 0x78634D, 0x495257],
+            lio: [0x25504E, 0xD4A877, 0x2F2019, 0x487A7D]
+        ]
+        skins.each { name, colors ->
+            def image = new java.awt.image.BufferedImage(64, 64, java.awt.image.BufferedImage.TYPE_INT_ARGB)
+            def g = image.createGraphics()
+            g.setComposite(java.awt.AlphaComposite.Src)
+            def fill = { int color, int x, int y, int w, int h ->
+                g.setColor(new java.awt.Color(color))
+                g.fillRect(x, y, w, h)
+            }
+            fill(colors[3], 0, 0, 64, 64)
+            fill(colors[1], 8, 8, 8, 8)
+            fill(colors[2], 8, 0, 8, 8)
+            fill(colors[2], 0, 8, 8, 8)
+            fill(colors[1], 16, 8, 8, 8)
+            fill(colors[1], 8, 16, 8, 8)
+            fill(colors[2], 8, 0, 8, 3)
+            fill(0x000000, 10, 10, 1, 1)
+            fill(0x000000, 13, 10, 1, 1)
+            fill(colors[0], 20, 20, 8, 12)
+            fill(colors[0], 28, 20, 8, 12)
+            fill(colors[1], 20, 16, 8, 4)
+            fill(colors[1], 40, 16, 4, 4)
+            fill(colors[0], 40, 20, 4, 8)
+            fill(colors[1], 32, 48, 4, 4)
+            fill(colors[0], 32, 52, 4, 8)
+            fill(colors[3], 16, 16, 4, 12)
+            fill(colors[3], 0, 16, 4, 12)
+            fill(colors[2], 16, 28, 4, 4)
+            fill(colors[2], 0, 28, 4, 4)
+            g.dispose()
+            javax.imageio.ImageIO.write(image, "PNG", new java.io.File(out, name + ".png"))
+        }
+    }
 }
 
 processResources {
