@@ -16,8 +16,14 @@ def main() -> int:
     rp = load(RP / "manifest.json")
     sd = load(RP / "sounds/sound_definitions.json")
 
-    if not any(d.get("uuid") == rp["header"]["uuid"] for d in bp.get("dependencies", [])):
-        raise SystemExit("Behavior pack does not depend on the voice resource pack.")
+    if not any(d.get("uuid") == rp["header"]["uuid"] and d.get("version") == bp["header"]["version"] for d in bp.get("dependencies", [])):
+        raise SystemExit("Behavior pack does not depend on the exact voice resource-pack version.")
+
+    native = {d.get("module_name"): d.get("version") for d in bp.get("dependencies", []) if d.get("module_name")}
+    if native.get("@minecraft/server") != "2.10.0":
+        raise SystemExit("Behavior pack is missing @minecraft/server 2.10.0.")
+    if native.get("@minecraft/server-ui") != "2.2.0":
+        raise SystemExit("Behavior pack is missing @minecraft/server-ui 2.2.0.")
 
     script_modules = [m for m in bp["modules"] if m.get("type") == "script"]
     if len(script_modules) != 1 or script_modules[0].get("entry") != "scripts/main.js":
@@ -41,6 +47,9 @@ def main() -> int:
     js = (BP / "scripts/main.js").read_text(encoding="utf-8")
     if "playSound" not in js or "minecraftstory:voice." not in js:
         raise SystemExit("Bedrock runtime is missing player-local voice playback.")
+    for npc_id in ["mara","elias","cael","sera","bram","nessa","pip","toma","lio","renn"]:
+        if f"minecraftstory_npc:{npc_id}" not in js:
+            raise SystemExit(f"Bedrock runtime is missing NPC tag: {npc_id}")
 
     print("Bedrock pack validation: OK")
     return 0
