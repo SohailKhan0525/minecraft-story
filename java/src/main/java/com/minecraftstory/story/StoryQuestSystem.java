@@ -316,7 +316,6 @@ public final class StoryQuestSystem {
         p.sendSystemMessage(Component.literal("Quest complete: " + finished), true);
         if (nextQuest == null || nextQuest.equals(s.activeQuest())) {
             s.set(StoryFlag.CHAPTER_1_COMPLETE);
-            StoryNetwork.cinematic(p, "CHAPTER 1 COMPLETE", "The Night the Sky Broke", 180);
             StoryNetwork.cinematic(p, "CREDITS", "Story • World • Quests • Characters • Cinematics • Code\\nOriginal game concept • Dialogue • NPCs • Boss design\\nBuilt for Minecraft Java Edition + Fabric\\nSpecial thanks: playtesting • Minecraft • Fabric", 480);
             s.set(StoryFlag.CHAPTER_2_UNLOCKED);
             p.sendSystemMessage(Component.literal("Chapter 1 complete — Chapter 2 unlocked."), true);
