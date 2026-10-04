@@ -53,5 +53,10 @@
     "sounds": [
       "minecraftstory:voice/post_credits"
     ]
+  },
+  "voice.chapter2_opening": {
+    "sounds": [
+      "minecraftstory:voice/chapter2_opening"
+    ]
   }
 }
