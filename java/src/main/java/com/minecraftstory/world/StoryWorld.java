@@ -123,7 +123,7 @@ public final class StoryWorld {
             double x = villager.getX(), y = villager.getY(), z = villager.getZ();
             switch (id) {
                 case "mara" -> { if (day < 6000) villager.getNavigation().moveTo(18, y, 0, 0.7); else villager.getNavigation().moveTo(24, y, 2, 0.65); }
-                case "elias" -> { if (!"Find Elias".equals(StorySessionManager.state(level.players().isEmpty() ? null : level.players().get(0)).activeQuest())) villager.getNavigation().moveTo(24, y, 4, 0.55); }
+                case "elias" -> villager.getNavigation().moveTo(24, y, 4, 0.55);
                 case "cael" -> villager.getNavigation().moveTo(10, y, 8, 0.45);
                 case "sera" -> villager.getNavigation().moveTo(38, y, -8, 0.55);
                 case "bram" -> villager.getNavigation().moveTo(28, y, 8, 0.45);
