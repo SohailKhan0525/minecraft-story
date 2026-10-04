@@ -57,6 +57,9 @@ def parse_chapter_1() -> list[tuple[str, list[tuple[str, str]]]]:
 def parse_chapter_2() -> list[tuple[str, list[tuple[str, str]]]]:
     source = CHAPTER_2.read_text(encoding="utf-8")
     lines = [(unescape_java(m.group(1)), unescape_java(m.group(2))) for m in LINE_NEW_DECL.finditer(source)]
+    dynamic = re.search(r'new Line\("Sera",\s*"You ".*?ending.*?mountain noticed\\."\)', source)
+    if dynamic:
+        lines.insert(min(3, len(lines)), ("Sera", "You made your choice. The mountain noticed."))
     return [("chapter2_opening", lines)] if lines else []
 
 def require_tool(name: str) -> None:
