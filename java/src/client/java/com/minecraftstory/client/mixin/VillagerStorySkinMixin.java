@@ -28,6 +28,7 @@ public abstract class VillagerStorySkinMixin {
             case "Sera Voss" -> "sera";
             case "Bram the Baker" -> "bram";
             case "Nessa the Blacksmith" -> "nessa";
+            case "Mira" -> "mira";
             default -> null;
         };
         if (skin == null) {
