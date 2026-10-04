@@ -47,9 +47,10 @@ def main() -> int:
     js = (BP / "scripts/main.js").read_text(encoding="utf-8")
     if "playSound" not in js or "minecraftstory:voice." not in js:
         raise SystemExit("Bedrock runtime is missing player-local voice playback.")
-    for npc_id in ["mara","elias","cael","sera","bram","nessa","pip","toma","lio","renn"]:
-        if f"minecraftstory_npc:{npc_id}" not in js:
-            raise SystemExit(f"Bedrock runtime is missing NPC tag: {npc_id}")
+    required_npcs = ["mara","elias","cael","sera","bram","nessa","pip","toma","lio","renn"]
+    for npc_id in required_npcs:
+        if f'["{npc_id}",' not in js:
+            raise SystemExit(f"Bedrock runtime is missing NPC definition: {npc_id}")
 
     print("Bedrock pack validation: OK")
     return 0
