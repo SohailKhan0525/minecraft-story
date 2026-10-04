@@ -3,11 +3,10 @@ package com.minecraftstory.story;
 import com.minecraftstory.MinecraftStory;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
 
 public final class StoryNetwork {
     private StoryNetwork() {}
@@ -48,11 +47,10 @@ public final class StoryNetwork {
         PayloadTypeRegistry.clientboundPlay().register(QuestHudState.TYPE, QuestHudState.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(DialogueChoice.TYPE, DialogueChoice.CODEC);
 
-        ServerPlayNetworking.registerGlobalReceiver(DialogueChoice.TYPE, (payload, context) -> {
-            context.server().execute(() -> StoryInteraction.handleChoice(context.player(), payload.npcId(), payload.choiceId()));
-        });
+        ServerPlayNetworking.registerGlobalReceiver(DialogueChoice.TYPE, (payload, context) ->
+                context.server().execute(() ->
+                        StoryInteraction.handleChoice(context.player(), payload.npcId(), payload.choiceId())));
     }
-}
 
     public static void syncQuest(net.minecraft.server.level.ServerPlayer player, StoryState state) {
         int target = StoryQuest.objectives(questId(state.activeQuest())).size();
@@ -72,3 +70,4 @@ public final class StoryNetwork {
             default -> "bell";
         };
     }
+}
