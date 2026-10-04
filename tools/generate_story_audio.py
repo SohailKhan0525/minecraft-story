@@ -24,7 +24,7 @@ CHAPTER_2 = ROOT / "java/src/main/java/com/minecraftstory/story/Chapter2Content.
 JAVA_OUT = ROOT / "java/src/main/resources/assets/minecraftstory/sounds/voice"
 BEDROCK_OUT = ROOT / "bedrock/resource_packs/minecraft_story/sounds/minecraftstory/voice"
 
-SCENE_DECL = re.compile(r'(?m)^\s*(?:scene|SCENES\\.put)\("([^"]+)"')
+SCENE_DECL = re.compile(r'(?:\bscene|\bSCENES\\.put)\("([^"]+)"')
 LINE_L_DECL = re.compile(r'l\("((?:\\\\.|[^"])*)",\s*"((?:\\\\.|[^"])*)",')
 LINE_NEW_DECL = re.compile(r'new Line\("((?:\\\\.|[^"])*)",\s*"((?:\\\\.|[^"])*)"\)')
 
