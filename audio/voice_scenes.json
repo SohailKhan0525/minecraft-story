@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "chapter1": [
+    "cold_open",
+    "havenfall",
+    "chapel",
+    "missing_sound",
+    "silent_forest",
+    "observatory",
+    "first_choice",
+    "door_below",
+    "heart",
+    "ending",
+    "post_credits"
+  ],
+  "chapter2": [
+    "chapter2_opening"
+  ]
+}
