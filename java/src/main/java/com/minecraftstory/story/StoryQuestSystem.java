@@ -156,7 +156,7 @@ public final class StoryQuestSystem {
             case PEACEFUL -> new DifficultyProfile(0, 0, true);
             case EASY -> new DifficultyProfile(1, 1, false);
             case NORMAL -> new DifficultyProfile(2, 2, false);
-            case HARD -> new DifficultyProfile(3, 3, false);
+            case HARD -> new DifficultyProfile(4, 4, false);
         };
     }
 
@@ -198,7 +198,7 @@ public final class StoryQuestSystem {
         }
         if (progress >= 2 && progress < 3 && in(p, 36, 3, 52, 20) && noTaggedMobs(level, p, "minecraftstory_hollow_knight")) {
             KNIGHT_FRACTURE_SPAWNED.put(p.getUUID(), true);
-            spawnGuardians(level, p, Math.max(1, d.combatCount() - 1));
+            spawnGuardians(level, p, Math.max(2, d.combatCount()));
             advance(p, s, 3, "The Hollow Knight fractures into echoes.");
         }
         if (progress >= 3 && in(p, 36, 3, 52, 20) && KNIGHT_FRACTURE_SPAWNED.getOrDefault(p.getUUID(), false)
@@ -215,7 +215,7 @@ public final class StoryQuestSystem {
         if (progress < 1 && in(p, 38, 12, 50, 24)) advance(p, s, 1, "Heart Chamber reached.");
         if (progress == 1 && !HEART_WAVES_SPAWNED.getOrDefault(p.getUUID(), false)) {
             HEART_WAVES_SPAWNED.put(p.getUUID(), true);
-            spawnWave(level, p, d.combatCount(), "minecraftstory_heart_wave");
+            spawnWave(level, p, d.combatCount() + 2, "minecraftstory_heart_wave");
         } else if (progress == 1 && HEART_WAVES_SPAWNED.getOrDefault(p.getUUID(), false)
                 && noTaggedMobs(level, p, "minecraftstory_heart_wave")) {
             HEART_WAVES_SPAWNED.remove(p.getUUID());
@@ -249,8 +249,18 @@ public final class StoryQuestSystem {
             entity.setPos(player.getX() + 3 + i * 2, player.getY(), player.getZ() + 5);
             entity.setCustomName(Component.literal(i == 0 ? "Hollow Knight" : "Knights Echo"));
             entity.setCustomNameVisible(true);
+            if (entity instanceof Mob mob) {
+                mob.setPersistenceRequired();
+                mob.setTarget(player);
+                mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE).setBaseValue(12.0D);
+                mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(45.0D);
+                mob.setHealth(45.0F);
+            }
             entity.addTag("minecraftstory_hollow_knight");
-            if (entity instanceof Mob mob) mob.setTarget(player);
+            if (entity instanceof Mob mob) {
+                mob.setPersistenceRequired();
+                mob.setTarget(player);
+            }
             level.addFreshEntity(entity);
         }
     }
@@ -306,6 +316,7 @@ public final class StoryQuestSystem {
         p.sendSystemMessage(Component.literal("Quest complete: " + finished), true);
         if (nextQuest == null || nextQuest.equals(s.activeQuest())) {
             s.set(StoryFlag.CHAPTER_1_COMPLETE);
+            StoryNetwork.cinematic(p, "CREDITS", "Story • World • Quests • Characters • Cinematics • Code\\nOriginal game concept • Dialogue • NPCs • Boss design\\nBuilt for Minecraft Java Edition + Fabric\\nSpecial thanks: playtesting • Minecraft • Fabric", 480);
             s.set(StoryFlag.CHAPTER_2_UNLOCKED);
             p.sendSystemMessage(Component.literal("Chapter 1 complete — Chapter 2 unlocked."), true);
         } else {
