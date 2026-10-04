@@ -66,6 +66,12 @@
       "sounds": [
         "sounds/minecraftstory/voice/post_credits"
       ]
+    },
+    "minecraftstory:voice.chapter2_opening": {
+      "category": "ui",
+      "sounds": [
+        "sounds/minecraftstory/voice/chapter2_opening"
+      ]
     }
   }
 }
