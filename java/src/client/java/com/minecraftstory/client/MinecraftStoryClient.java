@@ -13,7 +13,7 @@ public final class MinecraftStoryClient implements ClientModInitializer {
     public void onInitializeClient() {
         ClientPlayNetworking.registerGlobalReceiver(StoryNetwork.OpenDialogue.TYPE, (payload, context) -> {
             context.client().execute(() ->
-                    Minecraft.getInstance().setScreen(
+                    Minecraft.getInstance().gui.setScreen(
                             new DialogueScreen(payload.npcId(), payload.sceneId())
                     ));
         });
