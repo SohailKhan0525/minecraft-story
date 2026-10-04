@@ -286,6 +286,7 @@ public final class StoryQuestSystem {
         int target = StoryQuest.objectives(currentQuestId(s)).size();
         p.sendSystemMessage(Component.literal("Quest: " + s.activeQuest() + " [" + value + "/" + target + "] — " + text), true);
         StorySessionManager.save(p);
+        StoryNetwork.syncQuest(p, s);
     }
 
     private static void complete(ServerPlayer p, StoryState s, String nextQuest) {
@@ -302,6 +303,7 @@ public final class StoryQuestSystem {
             s.setQuestProgress(0);
         }
         StorySessionManager.save(p);
+        StoryNetwork.syncQuest(p, s);
         TICKS.remove(p.getUUID());
     }
 
