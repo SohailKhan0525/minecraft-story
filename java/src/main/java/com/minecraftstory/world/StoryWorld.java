@@ -6,6 +6,7 @@ import com.minecraftstory.story.StorySessionManager;
 import com.minecraftstory.story.StoryFlag;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -40,6 +41,12 @@ public final class StoryWorld {
     private StoryWorld() {}
 
     public static void register() {
+        UseBlockCallback.EVENT.register((player, level, hand, hitResult) -> {
+            if (level.isClientSide() || !(player instanceof ServerPlayer serverPlayer)) return InteractionResult.PASS;
+            StoryQuestSystem.onQuestBlockInteraction(serverPlayer, hitResult.getBlockPos());
+            return InteractionResult.PASS;
+        });
+
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
             if (level.isClientSide() || !(player instanceof ServerPlayer serverPlayer) || !(entity instanceof Villager villager)) {
                 return InteractionResult.PASS;
@@ -137,6 +144,9 @@ public final class StoryWorld {
         }
         fill(level, new BlockPos(29, oy, -1), new BlockPos(37, oy, 1), Blocks.GRAVEL.defaultBlockState());
         makeMarker(level, 36, oy, -6, Blocks.COBBLED_DEEPSLATE.defaultBlockState());
+        makeMarker(level, 35, oy - 10, -6, Blocks.GOLD_BLOCK.defaultBlockState());
+        makeMarker(level, 41, oy - 10, -4, Blocks.IRON_BLOCK.defaultBlockState());
+        makeMarker(level, 45, oy - 10, 0, Blocks.CRYING_OBSIDIAN.defaultBlockState());
 
         // Silent Forest.
         for (int x = 28; x <= 55; x += 4) {
