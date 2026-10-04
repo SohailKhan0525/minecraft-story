@@ -91,15 +91,24 @@ public final class StoryQuestSystem {
             }
             case "The Door Beneath the World" -> {
                 if (pos.equals(new net.minecraft.core.BlockPos(35, 55, -6)) && state.questProgress() == 0) {
+                    StoryItems.give(player, StoryItems.ASH_LENS);
                     setProgress(player, state, 1, "Ash Lens recovered.");
                 } else if (pos.equals(new net.minecraft.core.BlockPos(41, 55, -4)) && state.questProgress() == 1) {
+                    StoryItems.give(player, StoryItems.STAR_IRON_SHARD);
                     setProgress(player, state, 2, "Star-Iron Shard recovered.");
                 } else if (pos.equals(new net.minecraft.core.BlockPos(45, 55, 0)) && state.questProgress() == 2) {
+                    StoryItems.give(player, StoryItems.WARDEN_SEAL);
                     setProgress(player, state, 3, "Warden Seal recovered.");
-                } else if (pos.equals(new net.minecraft.core.BlockPos(42, 56, -4)) && state.questProgress() == 3) {
-                    setProgress(player, state, 4, "The Observatory ring mechanism aligns.");
-                } else if (pos.equals(new net.minecraft.core.BlockPos(42, 55, 6)) && state.questProgress() == 4) {
-                    setProgress(player, state, 5, "The door beneath the world opens.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(42, 56, -4)) && state.questProgress() == 3
+                        && StoryItems.has(player, StoryItems.ASH_LENS)
+                        && StoryItems.has(player, StoryItems.STAR_IRON_SHARD)
+                        && StoryItems.has(player, StoryItems.WARDEN_SEAL)) {
+                    setProgress(player, state, 4, "The Observatory ring recognizes the three relics.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(42, 55, 6)) && state.questProgress() == 4
+                        && StoryItems.consume(player, StoryItems.ASH_LENS)
+                        && StoryItems.consume(player, StoryItems.STAR_IRON_SHARD)
+                        && StoryItems.consume(player, StoryItems.WARDEN_SEAL)) {
+                    setProgress(player, state, 5, "The door beneath the world opens."); 
                 }
             }
             default -> {}
