@@ -1,0 +1,71 @@
+{
+  "format_version": "1.20.20",
+  "sound_definitions": {
+    "minecraftstory:voice.cold_open": {
+      "category": "ui",
+      "sounds": [
+        "sounds/minecraftstory/voice/cold_open"
+      ]
+    },
+    "minecraftstory:voice.havenfall": {
+      "category": "ui",
+      "sounds": [
+        "sounds/minecraftstory/voice/havenfall"
+      ]
+    },
+    "minecraftstory:voice.chapel": {
+      "category": "ui",
+      "sounds": [
+        "sounds/minecraftstory/voice/chapel"
+      ]
+    },
+    "minecraftstory:voice.missing_sound": {
+      "category": "ui",
+      "sounds": [
+        "sounds/minecraftstory/voice/missing_sound"
+      ]
+    },
+    "minecraftstory:voice.silent_forest": {
+      "category": "ui",
+      "sounds": [
+        "sounds/minecraftstory/voice/silent_forest"
+      ]
+    },
+    "minecraftstory:voice.observatory": {
+      "category": "ui",
+      "sounds": [
+        "sounds/minecraftstory/voice/observatory"
+      ]
+    },
+    "minecraftstory:voice.first_choice": {
+      "category": "ui",
+      "sounds": [
+        "sounds/minecraftstory/voice/first_choice"
+      ]
+    },
+    "minecraftstory:voice.door_below": {
+      "category": "ui",
+      "sounds": [
+        "sounds/minecraftstory/voice/door_below"
+      ]
+    },
+    "minecraftstory:voice.heart": {
+      "category": "ui",
+      "sounds": [
+        "sounds/minecraftstory/voice/heart"
+      ]
+    },
+    "minecraftstory:voice.ending": {
+      "category": "ui",
+      "sounds": [
+        "sounds/minecraftstory/voice/ending"
+      ]
+    },
+    "minecraftstory:voice.post_credits": {
+      "category": "ui",
+      "sounds": [
+        "sounds/minecraftstory/voice/post_credits"
+      ]
+    }
+  }
+}
