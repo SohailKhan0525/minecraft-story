@@ -80,7 +80,10 @@ public final class StoryQuestSystem {
 
     public static void resolveChoice(ServerPlayer player, String npcId) {
         StoryState state = StorySessionManager.state(player);
-        if ("sera".equals(npcId) && "Beneath the Roots".equals(state.activeQuest()) && state.questProgress() >= 5) {
+        if ("mara".equals(npcId) && "A Bell Before Breakfast".equals(state.activeQuest()) && state.questProgress() >= 1
+                && (state.has(StoryFlag.INTRO_LIGHT_SEEN) || state.has(StoryFlag.INTRO_MEMORY_MISSING) || state.has(StoryFlag.INTRO_LIGHT_DENIED))) {
+            complete(player, state, "Blue Fire");
+        } else if ("sera".equals(npcId) && "Beneath the Roots".equals(state.activeQuest()) && state.questProgress() >= 5) {
             complete(player, state, "The Door Beneath the World");
         } else if ("crystal".equals(npcId) && "The Heart of the Observatory".equals(state.activeQuest()) && state.questProgress() >= 4) {
             complete(player, state, "The Night Is Not Over");
