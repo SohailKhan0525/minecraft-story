@@ -6,7 +6,7 @@ An original story-driven Minecraft adventure with spoken dialogue, quests, explo
 
 ## Download and play
 
-Release pipeline: v1.0.0 is built and published only after GitHub Actions validation passes.
+Release pipeline: v1.0.0 is published only after GitHub Actions validation passes.
 
 The public release contains ready-to-use builds:
 
