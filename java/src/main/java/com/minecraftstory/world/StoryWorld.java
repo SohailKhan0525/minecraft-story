@@ -80,15 +80,15 @@ public final class StoryWorld {
             var state = StorySessionManager.state(player);
             StoryNetwork.syncQuest(player, state);
             if (!state.has(StoryFlag.PLAYER_PLACED)) {
-                player.setPos(-12.5D, 65.0D, 35.5D);
+                player.setPos(13.5D, 65.0D, 5.5D);
                 player.setYRot(180.0F);
                 player.setXRot(0.0F);
                 state.set(StoryFlag.PLAYER_PLACED);
                 StorySessionManager.save(player);
                 player.sendSystemMessage(net.minecraft.network.chat.Component.literal(
-                        "The Night the Sky Broke — follow the river toward Havenfall."
+                        "Chapter 1 — The Night the Sky Broke. Mara Vale is waiting in Havenfall."
                 ), true);
-                StoryNetwork.cinematic(player, "THE NIGHT THE SKY BROKE", "Follow the river. Havenfall is ahead.", 100);
+                StoryNetwork.cinematic(player, "THE NIGHT THE SKY BROKE", "Chapter 1 is beginning. Havenfall is ahead.", 100);
             }
         });
 
