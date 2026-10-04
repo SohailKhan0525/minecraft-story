@@ -172,9 +172,9 @@ function build(d){
   for(let i=0;i<12;i++){
     const y=63-Math.floor(i/2);
     const z=-18+i;
-    d.runCommand("setblock 38 "+y+" "+z polished_deepslate_stairs");
-    d.runCommand("setblock 37 "+y+" "+z cobbled_deepslate");
-    d.runCommand("setblock 39 "+y+" "+z cobbled_deepslate");
+    d.runCommand("setblock 38 "+y+" "+z+" polished_deepslate_stairs");
+    d.runCommand("setblock 37 "+y+" "+z+" cobbled_deepslate");
+    d.runCommand("setblock 39 "+y+" "+z+" cobbled_deepslate");
   }
   for(const [x,y,z,b] of [
     [25,64,11,"lectern"],
