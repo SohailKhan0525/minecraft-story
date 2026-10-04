@@ -429,7 +429,7 @@ public final class StoryWorld {
             String tag = "minecraftstory_npc:" + id;
             var matches = level.getEntitiesOfClass(Villager.class,
                     new AABB(-90, 40, -70, 90, 90, 50)).stream()
-.filter(v -> v.getTags().contains(tag))
+.filter(v -> tagNameEquals(v, tag))
                     .toList();
             for (int i = 1; i < matches.size(); i++) matches.get(i).discard();
 
@@ -451,6 +451,13 @@ public final class StoryWorld {
             villager.setGlowingTag(true);
         }
     }
+    private static boolean tagNameEquals(Villager villager, String tag) {
+        String name = villager.getCustomName() == null ? "" : villager.getCustomName().getString();
+        return NPCS.entrySet().stream()
+                .anyMatch(entry -> tag.equals("minecraftstory_npc:" + entry.getKey())
+                        && entry.getValue().name.equals(name));
+    }
+
     private static String npcIdFrom(Villager villager) {
         String name = villager.getCustomName() == null ? "" : villager.getCustomName().getString();
         return NPCS.entrySet().stream()
