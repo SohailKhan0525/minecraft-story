@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Generate Chapter 1 synthetic voice performances from the canonical Java dialogue file.
+"""Generate deterministic story voice performances for every shipped/future chapter scene.
 
-Requires: espeak, ffmpeg, Python 3.
-Outputs mono OGG Vorbis files for the Java resource namespace and the Bedrock resource pack.
+The shared profile table in audio/voice_profiles.json is the only voice identity source.
+Chapter 1 and Chapter 2 therefore cannot silently choose different voices for the same
+character. Audio is generated in GitHub Actions and bundled into the player releases.
 """
 
 from __future__ import annotations
 
+import json
 import re
 import shutil
 import subprocess
@@ -16,58 +18,64 @@ import wave
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "java/src/main/java/com/minecraftstory/story/Chapter1Content.java"
+PROFILES_PATH = ROOT / "audio/voice_profiles.json"
+CHAPTER_1 = ROOT / "java/src/main/java/com/minecraftstory/story/Chapter1Content.java"
+CHAPTER_2 = ROOT / "java/src/main/java/com/minecraftstory/story/Chapter2Content.java"
 JAVA_OUT = ROOT / "java/src/main/resources/assets/minecraftstory/sounds/voice"
 BEDROCK_OUT = ROOT / "bedrock/resource_packs/minecraft_story/sounds/minecraftstory/voice"
 
-PROFILES = {
-    "Narrator": ("en-sc", 125, 28),
-    "Wanderer": ("en-us", 145, 42),
-    "Mara": ("en-us+f2", 150, 55),
-    "Elias": ("en-us+f3", 175, 68),
-    "Cael": ("en-gb", 128, 32),
-    "Sera": ("en-us+f4", 158, 62),
-    "Bram": ("en-us+f5", 145, 72),
-    "Nessa": ("en-us+f3", 150, 48),
-    "Pip": ("en-us+f4", 178, 78),
-    "Toma": ("en-us+f3", 182, 82),
-    "Lio": ("en-us", 130, 40),
-    "Old Renn": ("en-sc", 108, 22),
-    "Hollow Knight": ("en-gb", 92, 12),
-    "Black Crystal": ("en-us", 105, 18),
-    "Warden of Deep": ("en-sc", 78, 8),
-    "Unknown Voice": ("en-gb", 88, 10),
-    "Mira": ("en-us+f2", 165, 70),
-}
-
-SCENE_DECL = re.compile(r'(?m)^\s*(?:scene|SCENES\.put)\("([^"]+)"')
-LINE_DECL = re.compile(r'l\("((?:\\\\.|[^"])*)",\s*"((?:\\\\.|[^"])*)",')
+SCENE_DECL = re.compile(r'(?m)^\s*(?:scene|SCENES\\.put)\("([^"]+)"')
+LINE_L_DECL = re.compile(r'l\("((?:\\\\.|[^"])*)",\s*"((?:\\\\.|[^"])*)",')
+LINE_NEW_DECL = re.compile(r'new Line\("((?:\\\\.|[^"])*)",\s*"((?:\\\\.|[^"])*)"\)')
 
 def unescape_java(value: str) -> str:
-    return value.replace('\\\\', '\\').replace('\\"', '"')
+    return value.replace('\\\\', '\\').replace('\\\"', '"')
 
-def parse_scenes() -> list[tuple[str, list[tuple[str, str]]]]:
-    source = SOURCE.read_text(encoding="utf-8")
+def load_profiles() -> dict:
+    data = json.loads(PROFILES_PATH.read_text(encoding="utf-8"))
+    if data.get("schema") != 1 or data.get("engine") != "espeak":
+        raise SystemExit("Unsupported voice profile manifest.")
+    return data["characters"]
+
+def parse_chapter_1() -> list[tuple[str, list[tuple[str, str]]]]:
+    source = CHAPTER_1.read_text(encoding="utf-8")
     decls = list(SCENE_DECL.finditer(source))
-    scenes: list[tuple[str, list[tuple[str, str]]]] = []
+    scenes = []
     for i, decl in enumerate(decls):
         start = decl.end()
         end = decls[i + 1].start() if i + 1 < len(decls) else len(source)
         block = source[start:end]
-        lines = [(unescape_java(m.group(1)), unescape_java(m.group(2))) for m in LINE_DECL.finditer(block)]
+        lines = [(unescape_java(m.group(1)), unescape_java(m.group(2))) for m in LINE_L_DECL.finditer(block)]
         if lines:
             scenes.append((decl.group(1), lines))
     return scenes
+
+def parse_chapter_2() -> list[tuple[str, list[tuple[str, str]]]]:
+    source = CHAPTER_2.read_text(encoding="utf-8")
+    lines = [(unescape_java(m.group(1)), unescape_java(m.group(2))) for m in LINE_NEW_DECL.finditer(source)]
+    return [("chapter2_opening", lines)] if lines else []
 
 def require_tool(name: str) -> None:
     if shutil.which(name) is None:
         raise SystemExit(f"Missing required tool: {name}")
 
-def synthesize(text: str, speaker: str, wav_path: Path) -> None:
-    voice, rate, pitch = PROFILES.get(speaker, ("en-us", 150, 50))
+def verify_speakers(scenes: list[tuple[str, list[tuple[str, str]]]], profiles: dict) -> None:
+    speakers = sorted({speaker for _, lines in scenes for speaker, _ in lines})
+    missing = [speaker for speaker in speakers if speaker not in profiles]
+    if missing:
+        raise SystemExit("Missing canonical voice profiles for: " + ", ".join(missing))
+
+def synthesize(text: str, speaker: str, wav_path: Path, profiles: dict) -> None:
+    profile = profiles[speaker]
     subprocess.run([
-        "espeak", "-v", voice, "-s", str(rate), "-p", str(pitch),
-        "-a", "92", "-g", "3", "-w", str(wav_path), text
+        "espeak",
+        "-v", profile["voice"],
+        "-s", str(profile["rate"]),
+        "-p", str(profile["pitch"]),
+        "-a", "92",
+        "-g", "3",
+        "-w", str(wav_path),
+        text,
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def concat_wavs(paths: list[Path], out_path: Path) -> None:
@@ -84,7 +92,7 @@ def concat_wavs(paths: list[Path], out_path: Path) -> None:
         for frame in frames:
             out.writeframes(frame)
 
-def generate_scene(scene_id: str, lines: list[tuple[str, str]]) -> int:
+def generate_scene(scene_id: str, lines: list[tuple[str, str]], profiles: dict) -> int:
     with tempfile.TemporaryDirectory(prefix="minecraft-story-voice-") as tmp:
         tmpdir = Path(tmp)
         silence = tmpdir / "silence.wav"
@@ -94,10 +102,10 @@ def generate_scene(scene_id: str, lines: list[tuple[str, str]]) -> int:
             w.setframerate(22050)
             w.writeframes(b"\0\0" * int(22050 * 0.18))
 
-        parts: list[Path] = []
+        parts = []
         for i, (speaker, text) in enumerate(lines):
             line = tmpdir / f"{i:03d}.wav"
-            synthesize(text, speaker, line)
+            synthesize(text, speaker, line, profiles)
             parts.extend([line, silence])
 
         combined = tmpdir / "combined.wav"
@@ -106,6 +114,7 @@ def generate_scene(scene_id: str, lines: list[tuple[str, str]]) -> int:
         JAVA_OUT.mkdir(parents=True, exist_ok=True)
         BEDROCK_OUT.mkdir(parents=True, exist_ok=True)
         java_file = JAVA_OUT / f"{scene_id}.ogg"
+
         subprocess.run([
             "ffmpeg", "-y", "-loglevel", "error", "-i", str(combined),
             "-ac", "1", "-ar", "22050", "-c:a", "libvorbis", "-q:a", "3",
@@ -117,14 +126,16 @@ def generate_scene(scene_id: str, lines: list[tuple[str, str]]) -> int:
 def main() -> int:
     require_tool("espeak")
     require_tool("ffmpeg")
-    scenes = parse_scenes()
+    profiles = load_profiles()
+    scenes = parse_chapter_1() + parse_chapter_2()
     if not scenes:
-        raise SystemExit(f"No scenes were parsed from {SOURCE}")
+        raise SystemExit("No story scenes were parsed.")
+    verify_speakers(scenes, profiles)
 
     total = 0
-    print(f"Generating {len(scenes)} scene voice performances...")
+    print(f"Generating {len(scenes)} deterministic story voice performances...")
     for scene_id, lines in scenes:
-        size = generate_scene(scene_id, lines)
+        size = generate_scene(scene_id, lines, profiles)
         total += size
         print(f"  {scene_id}: {len(lines)} lines, {size:,} bytes")
     print(f"Done. Generated {total:,} bytes of OGG voice assets.")
