@@ -43,11 +43,20 @@ def check_ogg(path: Path) -> None:
     r = subprocess.run([
         "ffprobe", "-v", "error", "-select_streams", "a:0",
         "-show_entries", "stream=codec_name,channels,sample_rate",
-        "-of", "csv=p=0", str(path),
+        "-of", "json", str(path),
     ], text=True, capture_output=True, check=True)
-    codec, channels, sample_rate = r.stdout.strip().split(",")
-    if codec != "vorbis" or channels != "1" or sample_rate != "22050":
-        raise SystemExit(f"Expected mono 22050 Hz OGG Vorbis: {path} ({r.stdout.strip()})")
+    streams = json.loads(r.stdout).get("streams", [])
+    if not streams:
+        raise SystemExit(f"No audio stream found: {path}")
+    stream = streams[0]
+    codec = str(stream.get("codec_name", ""))
+    channels = int(stream.get("channels", 0))
+    sample_rate = int(stream.get("sample_rate", 0))
+    if codec != "vorbis" or channels != 1 or sample_rate != 22050:
+        raise SystemExit(
+            f"Expected mono 22050 Hz OGG Vorbis: {path} "
+            f"(codec={codec}, channels={channels}, sample_rate={sample_rate})"
+        )
 
 def main() -> int:
     scenes_data = json.loads(SCENES_MANIFEST.read_text(encoding="utf-8"))
