@@ -3,6 +3,8 @@ package com.minecraftstory;
 import com.minecraftstory.story.Chapter1Content;
 import com.minecraftstory.story.Chapter1Story;
 import com.minecraftstory.story.StoryCommands;
+import com.minecraftstory.story.StoryNetwork;
+import com.minecraftstory.world.StoryWorld;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
@@ -21,6 +23,10 @@ public final class MinecraftStory implements ModInitializer {
         LOGGER.info("NPC count: {}", Chapter1Content.npcs().size());
         LOGGER.info("Quest count: {}", Chapter1Content.quests().size());
 
+        StoryNetwork.register();
+        StoryWorld.register();
+
+        // Developer-only tools remain available for testing; normal gameplay never requires them.
         StoryCommands.register();
     }
 
