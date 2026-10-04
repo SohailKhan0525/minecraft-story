@@ -4,6 +4,7 @@ import com.minecraftstory.story.Chapter1Content;
 import com.minecraftstory.story.Chapter1Story;
 import com.minecraftstory.story.StoryCommands;
 import com.minecraftstory.story.StoryNetwork;
+import com.minecraftstory.story.StoryItems;
 import com.minecraftstory.world.StoryWorld;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
