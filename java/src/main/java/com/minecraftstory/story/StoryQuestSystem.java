@@ -18,6 +18,7 @@ public final class StoryQuestSystem {
     private static final Map<UUID, Integer> TICKS = new ConcurrentHashMap<>();
     private static final Map<UUID, Boolean> KNIGHT_SPAWNED = new ConcurrentHashMap<>();
     private static final Map<UUID, Boolean> HEART_WAVES_SPAWNED = new ConcurrentHashMap<>();
+    private static final Map<UUID, Boolean> KNIGHT_FRACTURE_SPAWNED = new ConcurrentHashMap<>();
 
     private StoryQuestSystem() {}
 
@@ -194,8 +195,16 @@ public final class StoryQuestSystem {
             spawnGuardians(level, p, d.combatCount());
             advance(p, s, 2, "Survive the guardian assault.");
         }
-        if (progress >= 2 && in(p, 36, 3, 52, 20) && noTaggedMobs(level, p, "minecraftstory_hollow_knight")) {
-            advance(p, s, 3, "The guardian falls silent.");
+        if (progress >= 2 && progress < 3 && in(p, 36, 3, 52, 20) && noTaggedMobs(level, p, "minecraftstory_hollow_knight")) {
+            KNIGHT_FRACTURE_SPAWNED.put(p.getUUID(), true);
+            spawnGuardians(level, p, Math.max(1, d.combatCount() - 1));
+            advance(p, s, 3, "The Hollow Knight fractures into echoes.");
+        }
+        if (progress >= 3 && in(p, 36, 3, 52, 20) && KNIGHT_FRACTURE_SPAWNED.getOrDefault(p.getUUID(), false)
+                && noTaggedMobs(level, p, "minecraftstory_hollow_knight")) {
+            KNIGHT_FRACTURE_SPAWNED.remove(p.getUUID());
+            KNIGHT_SPAWNED.remove(p.getUUID());
+            advance(p, s, 4, "The final echo collapses.");
             complete(p, s, "The Heart of the Observatory");
         }
     }
