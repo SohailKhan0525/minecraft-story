@@ -42,9 +42,9 @@ public final class Chapter1Story {
 
     public static void chooseCrystalEnding(StoryState state, String choice) {
         switch (choice) {
-            case "seal" -> state.set(StoryFlag.CRYSTAL_SEALED);
-            case "touch" -> state.set(StoryFlag.CRYSTAL_TOUCHED);
-            case "destroy" -> state.set(StoryFlag.CRYSTAL_DESTROY_ATTEMPTED);
+            case "seal" -> { state.set(StoryFlag.CRYSTAL_SEALED); state.clear(StoryFlag.CRYSTAL_TOUCHED); state.clear(StoryFlag.CRYSTAL_DESTROY_ATTEMPTED); }
+            case "touch" -> { state.set(StoryFlag.CRYSTAL_TOUCHED); state.clear(StoryFlag.CRYSTAL_SEALED); state.clear(StoryFlag.CRYSTAL_DESTROY_ATTEMPTED); }
+            case "destroy" -> { state.set(StoryFlag.CRYSTAL_DESTROY_ATTEMPTED); state.clear(StoryFlag.CRYSTAL_SEALED); state.clear(StoryFlag.CRYSTAL_TOUCHED); }
             default -> throw new IllegalArgumentException("Unknown crystal choice: " + choice);
         }
         state.set(StoryFlag.CHAPTER_1_COMPLETE);
