@@ -48,8 +48,6 @@ jobs:
         run: node --check bedrock/behavior_packs/minecraft_story/scripts/main.js
       - name: Validate Bedrock packs
         run: python tools/validate_bedrock.py
-      - name: Package Bedrock add-on
-        run: python tools/package_bedrock_addon.py
 
   voice:
     name: Voice pipeline
