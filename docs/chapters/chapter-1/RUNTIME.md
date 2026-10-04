@@ -66,3 +66,6 @@ The **60-minute story/dialogue/cinematic envelope is separate from quest gamepla
 
 Quest time is earned through multi-step objectives and real in-world traversal. Difficulty changes encounter pressure: Peaceful uses puzzle/exploration completion, Easy uses lighter combat, Normal uses the standard encounter count, and Hard adds additional enemies/waves.
 
+## Build verification note
+
+The physical quest interaction layer is included in the verified Chapter 1 build path.

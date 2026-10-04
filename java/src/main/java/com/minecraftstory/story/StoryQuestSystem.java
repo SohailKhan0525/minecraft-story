@@ -32,7 +32,7 @@ public final class StoryQuestSystem {
         if (quest == null || state.has(StoryFlag.CHAPTER_1_COMPLETE)) return;
 
         int ticks = TICKS.merge(player.getUUID(), 1, Integer::sum);
-        // Keep world checks cheap while retaining responsive objective progression.
+        // Keep world checks cheap while retaining responsive objective progression; physical quest points are handled by block interaction callbacks.
         if (ticks % 5 != 0) return;
 
         ServerLevel level = player.level();
