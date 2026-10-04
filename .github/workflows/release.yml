@@ -107,7 +107,8 @@ jobs:
               for module in data.get('modules', []):
                   module['version'] = [major, minor, patch]
               for dependency in data.get('dependencies', []):
-                  dependency['version'] = [major, minor, patch]
+                  if 'uuid' in dependency:
+                      dependency['version'] = [major, minor, patch]
               p.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
 
           subprocess.run(['git', 'config', 'user.name', 'github-actions[bot]'], check=True)
