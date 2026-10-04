@@ -67,7 +67,7 @@ def main() -> int:
     for scene in chapter1:
         speakers.update(s for s, _ in source_scene(source1, scene, chapter1))
     source2 = CHAPTER_2.read_text(encoding="utf-8")
-    speakers.update(s for s, _ in LINE_NEW_DECL.finditer(source2))
+    speakers.update(unescape(m.group(1)) for m in LINE_NEW_DECL.finditer(source2))
     missing_profiles = sorted(speakers - set(characters))
     if missing_profiles:
         raise SystemExit("Missing canonical voice profiles: " + ", ".join(missing_profiles))
