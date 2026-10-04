@@ -116,8 +116,11 @@ jobs:
                           'java/gradle.properties',
                           'bedrock/behavior_packs/minecraft_story/manifest.json',
                           'bedrock/resource_packs/minecraft_story/manifest.json'], check=True)
-          subprocess.run(['git', 'commit', '-m', f'chore(release): {tag} [skip ci]'], check=True)
-          subprocess.run(['git', 'push', 'origin', 'HEAD:main'], check=True)
+          if subprocess.run(['git', 'diff', '--cached', '--quiet'], check=False).returncode != 0:
+              subprocess.run(['git', 'commit', '-m', f'chore(release): {tag} [skip ci]'], check=True)
+              subprocess.run(['git', 'push', 'origin', 'HEAD:main'], check=True)
+          else:
+              print(f'Version files already prepared for {tag}; reusing current main commit.')
           sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
               out.write(f'version={version}\n')
