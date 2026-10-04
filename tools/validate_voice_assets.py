@@ -58,6 +58,13 @@ def check_ogg(path: Path) -> None:
 def main() -> int:
     profiles = json.loads(PROFILES.read_text(encoding="utf-8"))
     characters = profiles.get("characters", {})
+    settings = profiles.get("engine_arguments", {})
+    if profiles.get("schema") != 1 or profiles.get("engine") != "espeak":
+        raise SystemExit("Invalid canonical voice profile manifest.")
+    if not {"amplitude", "gap", "sample_rate"}.issubset(settings):
+        raise SystemExit("Canonical voice profile manifest is missing engine settings.")
+    if int(settings["sample_rate"]) != 22050:
+        raise SystemExit("Canonical voice sample rate must remain 22050 Hz.")
     scenes, speakers = discover_scenes()
 
     missing_profiles = sorted(speakers - set(characters))
