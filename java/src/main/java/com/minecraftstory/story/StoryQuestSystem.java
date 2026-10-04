@@ -54,7 +54,10 @@ public final class StoryQuestSystem {
         switch (npcId) {
             case "mara" -> {
                 if ("A Bell Before Breakfast".equals(state.activeQuest()) &&
-                        state.questProgress() >= 1) complete(player, state, "Blue Fire");
+                        state.questProgress() >= 1 &&
+                        (state.has(StoryFlag.INTRO_LIGHT_SEEN) || state.has(StoryFlag.INTRO_MEMORY_MISSING) || state.has(StoryFlag.INTRO_LIGHT_DENIED))) {
+                    complete(player, state, "Blue Fire");
+                }
             }
             case "cael" -> {
                 if ("Blue Fire".equals(state.activeQuest()) && state.questProgress() >= 4) complete(player, state, "Find Elias");
@@ -166,9 +169,7 @@ public final class StoryQuestSystem {
         } else if (progress == 3 && noTaggedMobs(level, p, "minecraftstory_heart_wave")) {
             advance(p, s, 4, "The black crystal is exposed.");
         }
-        if (progress >= 4 && in(p, 42, 17, 48, 23)) {
-            p.displayClientMessage(Component.literal("The black crystal is exposed. Interact with it to choose its fate."), true);
-        }
+
     }
 
     private static void progressNight(ServerPlayer p, StoryState s, int progress) {
@@ -225,7 +226,8 @@ public final class StoryQuestSystem {
 
     private static void setProgress(ServerPlayer p, StoryState s, int value, String text) {
         s.setQuestProgress(value);
-        p.displayClientMessage(Component.literal("Quest: " + s.activeQuest() + " — " + text), true);
+        int target = StoryQuest.objectives(currentQuestId(s)).size();
+        p.displayClientMessage(Component.literal("Quest: " + s.activeQuest() + " [" + value + "/" + target + "] — " + text), true);
         StorySessionManager.save(p);
     }
 
@@ -233,8 +235,14 @@ public final class StoryQuestSystem {
         String currentId = questId(s.activeQuest());
         if (currentId != null) s.completeQuest(currentId);
         p.displayClientMessage(Component.literal("Quest complete: " + s.activeQuest()), true);
-        s.setActiveQuest(nextQuest);
-        s.setQuestProgress(0);
+        if (nextQuest == null || nextQuest.equals(s.activeQuest())) {
+            s.set(StoryFlag.CHAPTER_1_COMPLETE);
+            s.set(StoryFlag.CHAPTER_2_UNLOCKED);
+            p.displayClientMessage(Component.literal("Chapter 1 complete — Chapter 2 unlocked."), true);
+        } else {
+            s.setActiveQuest(nextQuest);
+            s.setQuestProgress(0);
+        }
         StorySessionManager.save(p);
         TICKS.remove(p.getUUID());
     }
@@ -242,6 +250,8 @@ public final class StoryQuestSystem {
     private static boolean in(ServerPlayer p, int minX, int minZ, int maxX, int maxZ) {
         return p.getX() >= minX && p.getX() <= maxX && p.getZ() >= minZ && p.getZ() <= maxZ;
     }
+
+    private static String currentQuestId(StoryState state) { return questId(state.activeQuest()); }
 
     private static String questId(String title) {
         return switch (title) {
