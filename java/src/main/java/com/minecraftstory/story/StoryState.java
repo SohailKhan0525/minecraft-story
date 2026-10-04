@@ -31,6 +31,6 @@ public final class StoryState {
     }
 
     public Set<StoryFlag> snapshot() {
-        return EnumSet.copyOf(flags);
+        return flags.isEmpty() ? EnumSet.noneOf(StoryFlag.class) : EnumSet.copyOf(flags);
     }
 }
