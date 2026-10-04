@@ -16,9 +16,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class StoryWorld {
     private static final BlockPos STORY_ORIGIN = new BlockPos(0, 64, 0);
+    private static final Set<ServerLevel> BUILT_LEVELS = ConcurrentHashMap.newKeySet();
 
     private static final Map<String, NpcSpec> NPCS = Map.of(
             "mara", new NpcSpec("Mara Vale", 20, 64, 0),
@@ -36,7 +39,7 @@ public final class StoryWorld {
             if (level.isClientSide() || !(player instanceof ServerPlayer serverPlayer) || !(entity instanceof Villager villager)) {
                 return InteractionResult.PASS;
             }
-            String npcId = villager.getPersistentData().getString("minecraftstory_npc").orElse("");
+            String npcId = villager.getTags().stream().filter(tag -> tag.startsWith("minecraftstory_npc:")).findFirst().map(tag -> tag.substring("minecraftstory_npc:".length())).orElse("");
             if (npcId.isBlank()) return InteractionResult.PASS;
 
             String scene = switch (npcId) {
@@ -67,7 +70,7 @@ public final class StoryWorld {
     }
 
     private static void ensureWorld(ServerLevel level) {
-        if (level.getPersistentData().getBooleanOr("minecraftstory_built", false)) return;
+        if (!BUILT_LEVELS.add(level)) return;
 
         int ox = STORY_ORIGIN.getX();
         int oy = STORY_ORIGIN.getY();
@@ -99,7 +102,7 @@ public final class StoryWorld {
             }
         }
 
-        level.getPersistentData().putBoolean("minecraftstory_built", true);
+
     }
 
     private static void buildHouse(ServerLevel level, int x, int y, int z, int width, int depth, BlockState wall, BlockState roof) {
@@ -145,7 +148,7 @@ public final class StoryWorld {
             boolean exists = level.getEntitiesOfClass(Villager.class,
                     new AABB(spec.x - 2, spec.y - 1, spec.z - 2, spec.x + 2, spec.y + 3, spec.z + 2))
                     .stream()
-                    .anyMatch(v -> id.equals(v.getPersistentData().getString("minecraftstory_npc").orElse("")));
+                    .anyMatch(v -> id.equals(v.getTags().stream().filter(tag -> tag.startsWith("minecraftstory_npc:")).findFirst().map(tag -> tag.substring("minecraftstory_npc:".length())).orElse("")));
             if (exists) continue;
 
             Villager villager = EntityType.VILLAGER.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
@@ -153,7 +156,7 @@ public final class StoryWorld {
             villager.setPos(spec.x + 0.5, spec.y, spec.z + 0.5);
             villager.setCustomName(net.minecraft.network.chat.Component.literal(spec.name));
             villager.setCustomNameVisible(true);
-            villager.getPersistentData().putString("minecraftstory_npc", id);
+            villager.addTag("minecraftstory_npc:" + id);
             level.addFreshEntity(villager);
         }
     }
