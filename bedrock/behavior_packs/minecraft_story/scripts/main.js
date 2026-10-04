@@ -82,13 +82,15 @@ function ensureNpc(d,id,name,x,y,z){
   if(found.length){
     found.slice(1).forEach(e=>e.remove());
     const e=found[0];
-    e.nameTag=name;
-    if(distanceSq(e.location,{x,y,z})>64) e.teleport({x,y,z});
+    e.nameTag="§e"+name;
+    try{ e.addEffect("glowing", 20000000, {showParticles:false}); }catch(_e){}
+    if(distanceSq(e.location,{x,y,z})>64) e.teleport({x,y,z},{checkForBlocks:false});
     return e;
   }
-  const e=d.spawnEntity("minecraft:villager",{x,y,z});
-  e.nameTag=name;
+  const e=d.spawnEntity("minecraft:villager_v2<minecraft:ageable_grow_up>",{x,y,z},{initialPersistence:true});
+  e.nameTag="§e"+name;
   e.addTag(tag);
+  try{ e.addEffect("glowing", 20000000, {showParticles:false}); }catch(_e){}
   return e;
 }
 function distanceSq(a,b){ return (a.x-b.x)**2+(a.y-b.y)**2+(a.z-b.z)**2; }
