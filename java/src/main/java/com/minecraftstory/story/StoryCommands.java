@@ -36,6 +36,8 @@ public final class StoryCommands {
                     StoryState state = state(context);
                     context.getSource().sendSuccess(() -> Component.literal(
                         "The Night the Sky Broke | Quest: " + state.activeQuest() +
+                        " | Progress: " + state.questProgress() + "/" + StoryQuest.objectives(questId(state.activeQuest())).size() +
+                        " | Completed: " + state.completedQuests() +
                         " | Flags: " + state.snapshot()
                     ), false);
                     return 1;
@@ -58,6 +60,20 @@ public final class StoryCommands {
         } catch (Exception e) {
             throw new IllegalStateException("This story command requires a player.");
         }
+    }
+
+    private static String questId(String title) {
+        return switch (title) {
+            case "A Bell Before Breakfast" -> "bell";
+            case "Blue Fire" -> "blue_fire";
+            case "Find Elias" -> "elias";
+            case "Beneath the Roots" -> "roots";
+            case "The Door Beneath the World" -> "door";
+            case "The Hollow Knight" -> "knight";
+            case "The Heart of the Observatory" -> "heart";
+            case "The Night Is Not Over" -> "night";
+            default -> "unknown";
+        };
     }
 
     private static void applyChoice(StoryState state, String choice) {
