@@ -85,7 +85,8 @@ def main() -> int:
                 raise SystemExit(f"{manifest_name} pack dependency version drift detected.")
     if not any(d["uuid"] == rp["header"]["uuid"] for d in bp.get("dependencies", [])):
         raise SystemExit("Behavior pack does not depend on the canonical voice resource pack.")
-    if "VERSION:" in (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8"):
+    release_text = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
+    if "VERSION:" in release_text:
         raise SystemExit("Release workflow still contains a hard-coded VERSION environment value.")
 
     scenes, speakers = discover_dialogue()
@@ -105,7 +106,7 @@ def main() -> int:
 
     release = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
     lower_release = release.lower()
-    if "latest published stable version" not in lower_release or "gh api" not in lower_release or "semver" not in lower_release:
+    if "latest published stable version" not in lower_release or "gh release list" not in lower_release or "semver" not in lower_release:
         raise SystemExit("Release workflow does not contain dynamic semantic-version detection.")
 
     if not (ROOT / ".gitignore").read_text(encoding="utf-8").count("dist/"):
