@@ -1,10 +1,14 @@
 package com.minecraftstory.story;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.util.Prediction;
 
 public final class StoryItems {
     public static final Item ASH_LENS = register("ash_lens");
@@ -14,9 +18,12 @@ public final class StoryItems {
     private StoryItems() {}
 
     private static Item register(String id) {
-        return BuiltInRegistries.ITEM.register(
-                Identifier.fromNamespaceAndPath("minecraftstory", id),
-                new Item(new Item.Properties().stacksTo(1))
+        Identifier identifier = Identifier.fromNamespaceAndPath("minecraftstory", id);
+        ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, identifier);
+        return Registry.register(
+                BuiltInRegistries.ITEM,
+                identifier,
+                new Item(new Item.Properties().setId(key).stacksTo(1))
         );
     }
 
@@ -41,7 +48,7 @@ public final class StoryItems {
 
     public static void give(ServerPlayer player, Item item) {
         if (!player.getInventory().add(new ItemStack(item))) {
-            player.drop(new ItemStack(item), false);
+            player.drop(new ItemStack(item), false, Prediction.SERVER_ONLY);
         }
     }
 }
