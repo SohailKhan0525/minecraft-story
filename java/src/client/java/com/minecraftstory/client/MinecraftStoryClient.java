@@ -11,6 +11,13 @@ import net.minecraft.network.chat.Component;
 public final class MinecraftStoryClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        StoryHud.register();
+
+        ClientPlayNetworking.registerGlobalReceiver(StoryNetwork.QuestHudState.TYPE, (payload, context) ->
+                context.client().execute(() ->
+                        StoryClientState.updateQuest(payload.quest(), payload.progress(), payload.target())
+                ));
+
         ClientPlayNetworking.registerGlobalReceiver(StoryNetwork.OpenDialogue.TYPE, (payload, context) -> {
             context.client().execute(() ->
                     Minecraft.getInstance().gui.setScreen(
