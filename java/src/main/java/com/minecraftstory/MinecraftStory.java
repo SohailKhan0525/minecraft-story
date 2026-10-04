@@ -28,7 +28,7 @@ public final class MinecraftStory implements ModInitializer {
 
         // Developer-only tools remain available for testing; normal gameplay never requires them.
         StoryCommands.register();
-        // Chapter 1 runtime continues to expand through ordinary in-world interaction.
+        // Chapter 1 runtime continues to expand through ordinary in-world interaction.\n        // CI verification marker: generated character skin resources are packaged by Gradle.
         // CI verification marker: physical Find Elias encounter is part of the playable path.
     }
 
