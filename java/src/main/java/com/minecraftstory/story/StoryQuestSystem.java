@@ -112,6 +112,7 @@ public final class StoryQuestSystem {
                 if ("A Bell Before Breakfast".equals(state.activeQuest()) &&
                         state.questProgress() >= 1 &&
                         (state.has(StoryFlag.INTRO_LIGHT_SEEN) || state.has(StoryFlag.INTRO_MEMORY_MISSING) || state.has(StoryFlag.INTRO_LIGHT_DENIED))) {
+                    setProgress(player, state, 2, "Mara sends you toward the chapel.");
                     complete(player, state, "Blue Fire");
                 }
             }
