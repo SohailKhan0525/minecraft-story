@@ -1,6 +1,6 @@
 # Chapter 1 — The Night the Sky Broke
 
-A cinematic dark-fantasy mystery adventure.
+A cinematic dark-fantasy mystery adventure with spoken dialogue.
 
 Havenfall has believed the northern mountains are dead for generations. On one impossible night, a star falls into the northern forest. The impact silences the woods, blue fire appears, and a stranger wakes beside the river with no memory and a strange scar across their palm.
 
@@ -13,6 +13,7 @@ Havenfall has believed the northern mountains are dead for generations. On one i
 - Sera Voss — an expedition survivor whose fate depends on the player's first major choice.
 - The Hollow Knight — a silent guardian who recognizes the Wanderer.
 - The Warden of the Deep — an ancient guardian obeying an old command.
+- Mira — a post-credit Havenfall character whose conversation with the Wanderer leads into the next chapter.
 
 ## Cinematic structure
 
@@ -26,10 +27,24 @@ Havenfall has believed the northern mountains are dead for generations. On one i
 8. The Door Beneath the World: relics, puzzles, and the buried observatory.
 9. The Hollow Knight: it kneels and says, 'You are late.'
 10. The Heart Chamber: the crystal says, 'Remember.'
-11. Final boss: Sentinel, Fracture, Memory.
-12. Final choice: seal, touch, or attempt to destroy the crystal.
-13. Ending: four new stars appear and the mountains open.
-14. Post-credit: Cael reveals that the Wanderer has returned.
+11. Final encounter: Sentinel, Fracture, Memory.
+12. Memory phase: the player must stop attacking and interact with the Heart.
+13. Final choice: seal, touch, or attempt to destroy the crystal.
+14. Ending: four new stars appear and the mountains open.
+15. Credits and post-credit Mira epilogue.
+16. **TO BE CONTINUED — CHAPTER 2 COMING SOON.**
+
+## Spoken audio
+
+Chapter 1 includes real generated audio performances for its authored scenes. The repository generates mono OGG Vorbis assets for Java and Bedrock from the canonical dialogue source.
+
+Run:
+
+`python tools/generate_story_audio.py`
+
+The generated voice layer uses distinct speaker profiles for Mara, Elias, Cael, Sera, the Wanderer, Hollow Knight, the Warden, Mira and supporting characters.
+
+These are synthetic original performances, not actor recordings.
 
 ## Quests
 
@@ -58,6 +73,7 @@ crystal_touched
 crystal_destroy_attempted
 chapter_1_complete
 chapter_2_unlocked
+POST_CREDITS_SCENE_SEEN
 
 ## Canon
 
