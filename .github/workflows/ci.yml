@@ -48,8 +48,6 @@ jobs:
         run: node --check bedrock/behavior_packs/minecraft_story/scripts/main.js
       - name: Validate Bedrock packs
         run: python tools/validate_bedrock.py
-      - name: Package and verify installable Bedrock artifacts
-        run: python tools/package_bedrock_addon.py
 
   voice:
     name: Voice pipeline
@@ -67,3 +65,22 @@ jobs:
         run: python tools/validate_repository.py
       - name: Validate voices
         run: python tools/validate_voice_assets.py
+
+
+  package:
+    name: Bedrock release package validation
+    needs: [bedrock, voice]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install open-source audio tools
+        run: sudo apt-get update && sudo apt-get install -y espeak ffmpeg
+      - name: Generate bundled story audio
+        run: python tools/generate_story_audio.py
+      - name: Validate generated voice assets
+        run: python tools/validate_voice_assets.py
+      - name: Package and verify MCPACK / MCADDON / MCWORLD
+        run: python tools/package_bedrock_addon.py
