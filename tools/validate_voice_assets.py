@@ -28,7 +28,10 @@ def scene_position(source: str, scene_id: str) -> int:
 
 def source_scene(source: str, scene_id: str, all_scene_ids: list[str]) -> list[tuple[str, str]]:
     start = scene_position(source, scene_id)
-    declaration_end = max(start + len(f'scene("{scene_id}"'), start + len(f'SCENES.put("{scene_id}"')))
+    declaration_end = max(
+        start + len(f'scene("{scene_id}"'),
+        start + len(f'SCENES.put("{scene_id}"')
+    )
     next_positions = [scene_position(source, other) for other in all_scene_ids if other != scene_id and scene_position(source, other) > start]
     end = min(next_positions) if next_positions else len(source)
     block = source[declaration_end:end]
