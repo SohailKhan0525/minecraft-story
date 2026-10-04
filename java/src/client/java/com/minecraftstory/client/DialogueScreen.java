@@ -15,7 +15,6 @@ public final class DialogueScreen extends Screen {
     private final String sceneId;
     private final Chapter1Content.Scene scene;
     private int scrollOffset;
-    private boolean voiceStarted;
 
     public DialogueScreen(String npcId, String sceneId) {
         super(Component.literal("Chapter 1"));
@@ -26,6 +25,15 @@ public final class DialogueScreen extends Screen {
 
     @Override
     protected void init() {
+        StoryVoice.playScene(sceneId);
+
+        if (!hasVoiceAsset()) {
+            if (!scene.lines().isEmpty()) {
+                Chapter1Content.Line first = scene.lines().get(0);
+                StoryVoice.speakFallback(first.speaker(), first.text());
+            }
+        }
+
         int buttonWidth = Math.min(520, this.width - 40);
         int x = (this.width - buttonWidth) / 2;
 
@@ -54,6 +62,10 @@ public final class DialogueScreen extends Screen {
         }
     }
 
+    private boolean hasVoiceAsset() {
+        return this.minecraft != null && this.minecraft.getResourceManager().getResource(StorySounds.asset(sceneId)).isPresent();
+    }
+
     private boolean hasChoice() {
         return npcId.equals("mara") || npcId.equals("sera") || npcId.equals("crystal") || npcId.equals("mira");
     }
@@ -74,18 +86,19 @@ public final class DialogueScreen extends Screen {
     }
 
     @Override
+    public void onClose() {
+        StoryVoice.stop();
+        super.onClose();
+    }
+
+    @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         super.extractRenderState(graphics, mouseX, mouseY, delta);
-        if (!voiceStarted && !scene.lines().isEmpty()) {
-            voiceStarted = true;
-            Chapter1Content.Line first = scene.lines().get(0);
-            StoryVoice.speak(first.speaker(), first.text());
-        }
 
         int left = 24;
         int top = 28;
         graphics.fill(14, 14, this.width - 14, this.height - 14, 0xCC090B12);
-        graphics.text(this.font, Component.literal(Chapter1Content.scene(sceneId).title()),
+        graphics.text(this.font, Component.literal(scene.title()),
                 left, top, 0xFFFFFFFF, true);
 
         int y = top + 24;
