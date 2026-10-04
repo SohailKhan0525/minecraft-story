@@ -11,6 +11,14 @@ public final class StoryInteraction {
         ServerPlayNetworking.send(player, new StoryNetwork.OpenDialogue(npcId, sceneId));
     }
 
+    public static void openIntroduction(ServerPlayer player) {
+        StoryState state = StorySessionManager.state(player);
+        if (state.has(StoryFlag.INTRO_STARTED) || state.has(StoryFlag.INTRO_LIGHT_SEEN) || state.has(StoryFlag.INTRO_MEMORY_MISSING) || state.has(StoryFlag.INTRO_LIGHT_DENIED)) return;
+        state.set(StoryFlag.INTRO_STARTED);
+        StorySessionManager.save(player);
+        open(player, "mara", "havenfall");
+    }
+
     public static void handleChoice(ServerPlayer player, String npcId, String choiceId) {
         StoryState state = StorySessionManager.state(player);
 
