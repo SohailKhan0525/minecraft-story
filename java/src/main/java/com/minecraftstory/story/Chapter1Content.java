@@ -261,14 +261,14 @@ public final class Chapter1Content {
 
     public static List<Quest> quests() {
         return List.of(
-            new Quest("bell","A Bell Before Breakfast","Reach Havenfall and speak with Mara.",5),
-            new Quest("blue_fire","Blue Fire","Investigate the cold blue flame in the chapel.",6),
-            new Quest("elias","Find Elias","Search the village and follow Elias's trail.",7),
-            new Quest("roots","Beneath the Roots","Enter the revealed staircase and recover the Observatory map.",10),
-            new Quest("door","The Door Beneath the World","Solve the Observatory mechanism and open the lower door.",8),
-            new Quest("knight","The Hollow Knight","Survive the guardian encounter.",3),
-            new Quest("heart","The Heart of the Observatory","Confront the Warden and decide the crystal's fate.",8),
-            new Quest("night","The Night Is Not Over","Escape and witness the four lights.",4)
+            new Quest("bell","A Bell Before Breakfast","Reach Havenfall, investigate the approach, and speak with Mara.",8),
+            new Quest("blue_fire","Blue Fire","Search the chapel and investigate three separate cold blue flames before reporting back.",11),
+            new Quest("elias","Find Elias","Search five clue locations and follow Elias's trail into the forest.",12),
+            new Quest("roots","Beneath the Roots","Cross the Silent Forest, read the ancient markers, reach the Observatory, and meet Sera.",13),
+            new Quest("door","The Door Beneath the World","Recover three relics, align the ring mechanism, and open the lower door.",14),
+            new Quest("knight","The Hollow Knight","Survive a difficulty-scaled guardian assault and defeat the Hollow Knight.",9),
+            new Quest("heart","The Heart of the Observatory","Survive two defense waves, reach the crystal, and decide its fate.",16),
+            new Quest("night","The Night Is Not Over","Escape the ruins, cross the forest and river, and witness the four lights.",10)
         );
     }
 }
