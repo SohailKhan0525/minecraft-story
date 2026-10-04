@@ -5,6 +5,7 @@ import com.minecraftstory.story.StoryQuestSystem;
 import com.minecraftstory.story.StorySessionManager;
 import com.minecraftstory.story.StoryFlag;
 import com.minecraftstory.story.StoryNetwork;
+import com.minecraftstory.story.StoryAmbientSystem;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -94,6 +95,7 @@ public final class StoryWorld {
                     spawnNpcs(level);
                     triggerProximityScenes(level);
                     for (ServerPlayer player : level.players()) StoryQuestSystem.tick(player);
+                    StoryAmbientSystem.tick(level);
                 }
             }
         });
