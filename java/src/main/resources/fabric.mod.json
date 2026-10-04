@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "minecraftstory",
+  "version": "${version}",
+  "name": "Minecraft Story",
+  "description": "An original episodic story-driven adventure for Minecraft.",
+  "authors": ["Minecraft Story Team"],
+  "contact": {
+    "sources": "https://github.com/SohailKhan0525/minecraft-story"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.minecraftstory.MinecraftStory"]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}
