@@ -23,14 +23,14 @@ public final class StoryInteraction {
         StoryState state = StorySessionManager.state(player);
 
         switch (npcId + ":" + choiceId) {
-            case "mara:light_yes" -> Chapter1Story.chooseIntroduction(state, "saw_the_light");
-            case "mara:light_no" -> Chapter1Story.chooseIntroduction(state, "memory_missing");
-            case "mara:light_unsure" -> Chapter1Story.chooseIntroduction(state, "deny_light");
-            case "sera:mercy" -> Chapter1Story.chooseObservatoryPath(state, true);
-            case "sera:knowledge" -> Chapter1Story.chooseObservatoryPath(state, false);
-            case "crystal:seal" -> Chapter1Story.chooseCrystalEnding(state, "seal");
-            case "crystal:touch" -> Chapter1Story.chooseCrystalEnding(state, "touch");
-            case "crystal:destroy" -> Chapter1Story.chooseCrystalEnding(state, "destroy");
+            case "mara:light_yes" -> { Chapter1Story.chooseIntroduction(state, "saw_the_light"); state.setActiveQuest("Blue Fire"); }
+            case "mara:light_no" -> { Chapter1Story.chooseIntroduction(state, "memory_missing"); state.setActiveQuest("Blue Fire"); }
+            case "mara:light_unsure" -> { Chapter1Story.chooseIntroduction(state, "deny_light"); state.setActiveQuest("Blue Fire"); }
+            case "sera:mercy" -> { Chapter1Story.chooseObservatoryPath(state, true); state.setActiveQuest("The Door Beneath the World"); }
+            case "sera:knowledge" -> { Chapter1Story.chooseObservatoryPath(state, false); state.setActiveQuest("The Door Beneath the World"); }
+            case "crystal:seal" -> { Chapter1Story.chooseCrystalEnding(state, "seal"); state.setActiveQuest("The Night Is Not Over"); }
+            case "crystal:touch" -> { Chapter1Story.chooseCrystalEnding(state, "touch"); state.setActiveQuest("The Night Is Not Over"); }
+            case "crystal:destroy" -> { Chapter1Story.chooseCrystalEnding(state, "destroy"); state.setActiveQuest("The Night Is Not Over"); }
             default -> { return; }
         }
 
