@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "engine": "espeak",
+  "engine_arguments": {
+    "amplitude": 92,
+    "gap": 3,
+    "sample_rate": 22050
+  },
+  "characters": {
+    "Narrator": { "voice": "en-sc", "rate": 125, "pitch": 28 },
+    "Wanderer": { "voice": "en-us", "rate": 145, "pitch": 42 },
+    "Mara": { "voice": "en-us+f2", "rate": 150, "pitch": 55 },
+    "Elias": { "voice": "en-us+f3", "rate": 175, "pitch": 68 },
+    "Cael": { "voice": "en-gb", "rate": 128, "pitch": 32 },
+    "Sera": { "voice": "en-us+f4", "rate": 158, "pitch": 62 },
+    "Bram": { "voice": "en-us+f5", "rate": 145, "pitch": 72 },
+    "Nessa": { "voice": "en-us+f3", "rate": 150, "pitch": 48 },
+    "Pip": { "voice": "en-us+f4", "rate": 178, "pitch": 78 },
+    "Toma": { "voice": "en-us+f3", "rate": 182, "pitch": 82 },
+    "Lio": { "voice": "en-us", "rate": 130, "pitch": 40 },
+    "Old Renn": { "voice": "en-sc", "rate": 108, "pitch": 22 },
+    "Hollow Knight": { "voice": "en-gb", "rate": 92, "pitch": 12 },
+    "Black Crystal": { "voice": "en-us", "rate": 105, "pitch": 18 },
+    "Warden of Deep": { "voice": "en-sc", "rate": 78, "pitch": 8 },
+    "Unknown Voice": { "voice": "en-gb", "rate": 88, "pitch": 10 },
+    "Mira": { "voice": "en-us+f2", "rate": 165, "pitch": 70 }
+  }
+}
