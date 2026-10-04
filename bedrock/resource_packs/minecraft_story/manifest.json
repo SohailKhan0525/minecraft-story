@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Minecraft Story — Voice Pack",
+    "name": "Minecraft Story \u2014 Voice Pack",
     "description": "Generated original synthetic voice performances using the canonical cross-chapter voice profiles.",
     "uuid": "d4c4b82a-fb7d-49df-a2b8-7a02fc6b6a3d",
     "version": [
       1,
       0,
-      0
+      1
     ],
     "min_engine_version": [
       1,
@@ -23,7 +23,7 @@
       "version": [
         1,
         0,
-        0
+        1
       ]
     }
   ]
