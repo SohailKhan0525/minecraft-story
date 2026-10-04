@@ -32,9 +32,9 @@ public final class StoryWorld {
     private static long NPC_SCHEDULE_TICK;
 
     private static final Map<String, NpcSpec> NPCS = Map.of(
-            "mara", new NpcSpec("Mara Vale", 20, 64, 0),
-            "elias", new NpcSpec("Elias Venn", 24, 64, 4),
-            "cael", new NpcSpec("Brother Cael", 10, 64, 8),
+            "mara", new NpcSpec("Mara Vale", 18, 64, -2),
+            "elias", new NpcSpec("Elias Venn", 23, 64, 4),
+            "cael", new NpcSpec("Brother Cael", 16, 64, 8),
             "sera", new NpcSpec("Sera Voss", 38, 64, -8),
             "bram", new NpcSpec("Bram the Baker", 28, 64, 8),
             "nessa", new NpcSpec("Nessa the Blacksmith", 0, 64, -8),
@@ -92,6 +92,14 @@ public final class StoryWorld {
             }
         });
 
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
+            if (alive) return;
+            StoryState state = StorySessionManager.state(newPlayer);
+            respawnAtCheckpoint(newPlayer, state);
+            StoryNetwork.syncQuest(newPlayer, state);
+            StorySessionManager.save(newPlayer);
+        });
+
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerLevel level : server.getAllLevels()) {
                 if (!level.players().isEmpty()) {
@@ -108,7 +116,7 @@ public final class StoryWorld {
 
     private static void triggerProximityScenes(ServerLevel level) {
         Villager mara = level.getEntitiesOfClass(Villager.class,
-                new AABB(17, 63, -3, 23, 68, 3)).stream()
+                new AABB(15, 63, -5, 21, 68, 1)).stream()
                 .filter(v -> "Mara Vale".equals(v.getCustomName() == null ? "" : v.getCustomName().getString()))
                 .findFirst().orElse(null);
         if (mara == null) return;
