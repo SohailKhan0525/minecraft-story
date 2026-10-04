@@ -1,0 +1,108 @@
+name: Release Chapter 1
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  VERSION: "1.0.0"
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Install open-source voice/audio tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y espeak ffmpeg
+      - name: Validate Bedrock script syntax
+        run: node --check bedrock/behavior_packs/minecraft_story/scripts/main.js
+      - name: Validate Bedrock pack structure
+        run: python tools/validate_bedrock.py
+      - name: Generate Chapter 1 spoken audio
+        run: python tools/generate_story_audio.py
+      - name: Validate every generated voice file
+        run: python tools/validate_voice_assets.py
+      - name: Build Java release with voices included
+        working-directory: java
+        run: gradle build --stacktrace --warning-mode all
+      - name: Package Bedrock release with voices included
+        run: python tools/package_bedrock_addon.py
+      - name: Prepare release assets
+        run: |
+          mkdir -p release
+          cp java/build/libs/*.jar "release/minecraft-story-java-${{ env.VERSION }}.jar"
+          cp dist/minecraft-story-chapter-1.mcaddon "release/minecraft-story-bedrock-${{ env.VERSION }}.mcaddon"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chapter-1-release-${{ env.VERSION }}
+          path: release/*
+
+  publish:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v5
+        with:
+          name: chapter-1-release-${{ env.VERSION }}
+          path: release
+      - name: Publish semantic GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ env.VERSION }}
+          target_commitish: ${{ github.sha }}
+          name: Minecraft Story — Chapter 1 v${{ env.VERSION }}
+          generate_release_notes: true
+          body: |
+            # Minecraft Story — Chapter 1
+
+            The Night the Sky Broke
+
+            ## Install
+
+            Java Edition: download minecraft-story-java-${{ env.VERSION }}.jar, install Minecraft Java 26.3 + Fabric Loader 0.19.5 + Fabric API 0.161.0+26.3, place the JAR in .minecraft/mods, launch Fabric 26.3, and create a new world.
+
+            Bedrock Edition: download minecraft-story-bedrock-${{ env.VERSION }}.mcaddon, open it with Minecraft Bedrock, let it import, activate the Minecraft Story behavior pack and Chapter 1 Voice Pack resource pack, then create a new world.
+
+            ## Voice
+
+            Spoken Chapter 1 audio is already bundled in both release builds. There is no separate voice download.
+
+            ## Release contents
+
+            - Full Chapter 1 story flow
+            - Spoken Chapter 1 scene audio
+            - Java Fabric mod
+            - Bedrock add-on
+            - Ending, credits, and Mira post-credit scene
+            - Chapter 2 coming-soon endpoint
+
+            ## Compatibility
+
+            Java: Minecraft 26.3 + Fabric Loader 0.19.5 + Fabric API 0.161.0+26.3.
+
+            Bedrock: packaged Bedrock add-on. Windows, Android and iOS use the normal Minecraft add-on import flow. Console distribution uses the supported Bedrock/world/Realm workflow for that platform.
+
+            This project is independent Minecraft content and is not affiliated with Mojang or Microsoft.
+
+          files: |
+            release/minecraft-story-java-${{ env.VERSION }}.jar
+            release/minecraft-story-bedrock-${{ env.VERSION }}.mcaddon
