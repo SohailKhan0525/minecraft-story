@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 SEMVER = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
-SCENE_RE = re.compile(r'(?m)^\s*(?:scene|SCENES\\.put)\("([^"]+)"')
+SCENE_RE = re.compile(r'(?:\bscene|\bSCENES\\.put)\("([^"]+)"')
 CH1_LINE_RE = re.compile(r'l\("((?:\\\\.|[^"])*)",\s*"((?:\\\\.|[^"])*)",')
 CH2_LINE_RE = re.compile(r'new Line\("((?:\\\\.|[^"])*)",\s*"((?:\\\\.|[^"])*)"\)')
 
