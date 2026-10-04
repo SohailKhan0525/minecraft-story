@@ -2,6 +2,7 @@ package com.minecraftstory.story;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -27,7 +28,7 @@ public final class StorySavedData extends SavedData {
     );
 
     private static final SavedDataType<StorySavedData> TYPE = new SavedDataType<>(
-            "minecraftstory",
+            Identifier.fromNamespaceAndPath("minecraftstory", "story"),
             StorySavedData::new,
             CODEC,
             null
