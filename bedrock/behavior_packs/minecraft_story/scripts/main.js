@@ -7,6 +7,8 @@ const CHECKPOINT = "minecraftstory_checkpoint";
 const MEMORY_READY = "minecraftstory_memory_ready";
 const VOICE_LAST = "minecraftstory_last_voice";
 const WORLD_MARK = "minecraftstory_bedrock_world_built";
+const WORLD_VERSION = "minecraftstory_bedrock_world_version";
+const MEMORY_TAG = "minecraftstory_memory";
 const VOICE_PREFIX = "minecraftstory:voice.";
 const STORY_TAG_PREFIX = "minecraftstory_npc:";
 const WAVE_TAG = "minecraftstory_wave";
@@ -122,7 +124,8 @@ function blockText(d,text,x,y,z,block="gold_block"){
   }
 }
 function build(d){
-  if(world.getDynamicProperty(WORLD_MARK))return;
+  const version=Number(world.getDynamicProperty(WORLD_VERSION)??0);
+  if(world.getDynamicProperty(WORLD_MARK) && version>=2)return;
   d.runCommand("fill -60 63 -50 60 63 38 grass_block");
   d.runCommand("fill -60 64 28 60 64 33 water");
   d.runCommand("fill -60 64 27 60 64 27 sand");
@@ -141,6 +144,7 @@ function build(d){
   blockText(d,"CHAPTER 1", -13, 65, 18, "gold_block");
   d.runCommand("setblock -14 64 17 glowstone");
   world.setDynamicProperty(WORLD_MARK,true);
+  world.setDynamicProperty(WORLD_VERSION,2);
 }
 async function intro(p){
   voice(p,"havenfall");
@@ -263,7 +267,8 @@ function inspectBlock(p,b){
     return;
   }
   if(s===15&&x===45&&y===56&&z===20){
-    setStage(p,16); void finalChoice(p); return;
+    p.dimension.getEntities({tags:[MEMORY_TAG]}).forEach(e=>e.remove());
+    void finalChoice(p); return;
   }
 }
 function advanceStory(p){
@@ -322,6 +327,5 @@ system.runInterval(()=>{
     build(p.dimension);
     advanceStory(p);
     if(stage(p)===13 && !waveAlive(p.dimension))advanceStory(p);
-    if(stage(p)===14 && !waveAlive(p.dimension))advanceStory(p);
   }
 },20);
