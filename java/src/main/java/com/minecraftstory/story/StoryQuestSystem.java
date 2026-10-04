@@ -49,6 +49,11 @@ public final class StoryQuestSystem {
             case "knight" -> progressKnight(player, state, level, progress);
             case "heart" -> progressHeart(player, state, level, progress);
             case "night" -> progressNight(player, state, progress);
+            case "first_star" -> progressFirstStar(player, state, progress);
+            case "ashes" -> progressAshes(player, state, progress);
+            case "cartographer" -> progressCartographer(player, state, progress);
+            case "four" -> progressFour(player, state, progress);
+            case "returning" -> progressReturning(player, state, progress);
             default -> {}
         }
     }
@@ -76,6 +81,35 @@ public final class StoryQuestSystem {
                     setProgress(player, state, 3, "The second flame whispers a name.");
                 } else if (pos.equals(new net.minecraft.core.BlockPos(8, 65, 12)) && state.questProgress() == 3) {
                     setProgress(player, state, 4, "The third flame points underground.");
+                }
+            }
+            case "The First Star" -> {
+                if (pos.equals(new net.minecraft.core.BlockPos(54, 64, -24)) && state.questProgress() == 0) {
+                    state.set(StoryFlag.CHAPTER_2_STAR_FOUND);
+                    setProgress(player, state, 1, "The moving star has left a fragment behind.");
+                }
+            }
+            case "Ashes in Havenfall" -> {
+                if (pos.equals(new net.minecraft.core.BlockPos(12, 64, -2)) && state.questProgress() == 0) {
+                    state.set(StoryFlag.CHAPTER_2_ASHES_PATH);
+                    setProgress(player, state, 1, "The chapel ash remembers the night.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(22, 64, 8)) && state.questProgress() == 1) {
+                    setProgress(player, state, 2, "The village bell carries a second voice.");
+                }
+            }
+            case "The Cartographer's Lie" -> {
+                if (pos.equals(new net.minecraft.core.BlockPos(54, 64, -8)) && state.questProgress() == 0) {
+                    setProgress(player, state, 1, "Elias's copied map contradicts the mountain.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(48, 64, -18)) && state.questProgress() == 1) {
+                    state.set(StoryFlag.CHAPTER_2_MAP_TRUTH);
+                    setProgress(player, state, 2, "The map was drawn after the sky broke.");
+                }
+            }
+            case "Beneath the Four" -> {
+                if (pos.equals(new net.minecraft.core.BlockPos(52, 54, -30)) && state.questProgress() == 0) {
+                    setProgress(player, state, 1, "The first star-door opens.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(58, 54, -30)) && state.questProgress() == 1) {
+                    setProgress(player, state, 2, "Something on the other side knows your name.");
                 }
             }
             case "Beneath the Roots" -> {
@@ -252,6 +286,39 @@ public final class StoryQuestSystem {
             advance(p, s, 4, "The black crystal is exposed.");
         }
 
+    }
+
+    private static void progressFirstStar(ServerPlayer p, StoryState s, int progress) {
+        if (progress < 1 && in(p, 48, -30, 60, -15)) {
+            advance(p, s, 1, "The northern star has fallen into the forest.");
+        }
+        if (progress >= 1) complete(p, s, "Ashes in Havenfall");
+    }
+
+    private static void progressAshes(ServerPlayer p, StoryState s, int progress) {
+        if (progress >= 2) complete(p, s, "The Cartographer's Lie");
+    }
+
+    private static void progressCartographer(ServerPlayer p, StoryState s, int progress) {
+        if (progress >= 2) complete(p, s, "Beneath the Four");
+    }
+
+    private static void progressFour(ServerPlayer p, StoryState s, int progress) {
+        if (progress < 1 && in(p, 49, -34, 62, -26)) advance(p, s, 1, "The first star-door is awake.");
+        if (progress >= 2) complete(p, s, "The Returning");
+    }
+
+    private static void progressReturning(ServerPlayer p, StoryState s, int progress) {
+        if (progress < 1 && in(p, 46, -20, 62, -8)) advance(p, s, 1, "The returning voice is waiting.");
+        if (progress >= 1) {
+            s.set(StoryFlag.CHAPTER_2_COMPLETE);
+            s.set(StoryFlag.CHAPTER_2_UNLOCKED);
+            StorySessionManager.save(p);
+            StoryNetwork.cinematic(p, "THE FOUR STARS", "Chapter 2 complete\nThe door is open.\nThe story continues.", 240);
+            StoryNetwork.syncQuest(p, s);
+            p.sendSystemMessage(Component.literal("Chapter 2 complete — the next chapter is unlocked."), true);
+            TICKS.remove(p.getUUID());
+        }
     }
 
     private static void progressNight(ServerPlayer p, StoryState s, int progress) {
