@@ -16,3 +16,11 @@ Thumbs.db
 
 # Minecraft development/runtime data
 run/
+
+# Generated release/audio output
+
+dist/
+
+java/src/main/resources/assets/minecraftstory/sounds/voice/*.ogg
+
+bedrock/resource_packs/minecraft_story/sounds/minecraftstory/voice/*.ogg
