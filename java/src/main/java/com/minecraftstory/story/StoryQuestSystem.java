@@ -70,6 +70,8 @@ public final class StoryQuestSystem {
                     setProgress(player, state, 3, "The second marker names eleven kneeling figures.");
                 } else if (pos.equals(new net.minecraft.core.BlockPos(41, 64, -9)) && state.questProgress() == 3) {
                     setProgress(player, state, 4, "The third marker leaves one figure standing.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(38, 54, -10)) && state.questProgress() == 4) {
+                    setProgress(player, state, 5, "Elias's impossible map is pinned beneath the roots.");
                 }
             }
             case "The Door Beneath the World" -> {
@@ -81,6 +83,8 @@ public final class StoryQuestSystem {
                     setProgress(player, state, 3, "Warden Seal recovered.");
                 } else if (pos.equals(new net.minecraft.core.BlockPos(42, 56, -4)) && state.questProgress() == 3) {
                     setProgress(player, state, 4, "The Observatory ring mechanism aligns.");
+                } else if (pos.equals(new net.minecraft.core.BlockPos(42, 55, 6)) && state.questProgress() == 4) {
+                    setProgress(player, state, 5, "The door beneath the world opens.");
                 }
             }
             default -> {}
@@ -163,7 +167,7 @@ public final class StoryQuestSystem {
     }
 
     private static void progressDoor(ServerPlayer p, StoryState s, int progress) {
-        if (progress >= 4 && in(p, 38, 5, 46, 11)) complete(p, s, "The Hollow Knight");
+        if (progress >= 5 && in(p, 38, 5, 46, 11)) complete(p, s, "The Hollow Knight");
     }
 
     private static void progressKnight(ServerPlayer p, StoryState s, ServerLevel level, int progress) {
