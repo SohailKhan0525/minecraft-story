@@ -20,13 +20,18 @@ LINE_NEW_DECL = re.compile(r'new Line\("((?:\\\\.|[^"])*)",\s*"((?:\\\\.|[^"])*)
 def unescape(value: str) -> str:
     return value.replace('\\\\', '\\').replace('\\"', '"')
 
-def source_scene(source: str, scene_id: str) -> list[tuple[str, str]]:
-    start = re.search(r'(?:\bscene|\bSCENES\.put)\("' + re.escape(scene_id) + r'"', source)
-    if not start:
+def scene_position(source: str, scene_id: str) -> int:
+    positions = [p for p in (source.find(f'scene("{scene_id}"'), source.find(f'SCENES.put("{scene_id}"')) if p >= 0]
+    if not positions:
         raise SystemExit(f"Missing dialogue scene: {scene_id}")
-    remainder = source[start.end():]
-    next_match = re.search(r'(?:\bscene|\bSCENES\.put)\("', remainder)
-    block = remainder[:next_match.start()] if next_match else remainder
+    return min(positions)
+
+def source_scene(source: str, scene_id: str, all_scene_ids: list[str]) -> list[tuple[str, str]]:
+    start = scene_position(source, scene_id)
+    declaration_end = max(start + len(f'scene("{scene_id}"'), start + len(f'SCENES.put("{scene_id}"')))
+    next_positions = [scene_position(source, other) for other in all_scene_ids if other != scene_id and scene_position(source, other) > start]
+    end = min(next_positions) if next_positions else len(source)
+    block = source[declaration_end:end]
     return [(unescape(m.group(1)), unescape(m.group(2))) for m in LINE_L_DECL.finditer(block)]
 
 def check_ogg(path: Path) -> None:
@@ -42,29 +47,27 @@ def check_ogg(path: Path) -> None:
         raise SystemExit(f"Expected mono 22050 Hz OGG Vorbis: {path} ({r.stdout.strip()})")
 
 def main() -> int:
-    manifest = json.loads(SCENES_MANIFEST.read_text(encoding="utf-8"))
-    chapter1 = list(manifest.get("chapter1", []))
-    chapter2 = list(manifest.get("chapter2", []))
-    if chapter1 != ["cold_open","havenfall","chapel","missing_sound","silent_forest","observatory","first_choice","door_below","heart","ending","post_credits"]:
-        raise SystemExit("Chapter 1 voice scene manifest is incomplete or out of order.")
-    if chapter2 != ["chapter2_opening"]:
-        raise SystemExit("Chapter 2 voice scene manifest is incomplete or out of order.")
+    scenes_data = json.loads(SCENES_MANIFEST.read_text(encoding="utf-8"))
+    chapter1 = list(scenes_data.get("chapter1", []))
+    chapter2 = list(scenes_data.get("chapter2", []))
+    expected_ch1 = ["cold_open","havenfall","chapel","missing_sound","silent_forest","observatory","first_choice","door_below","heart","ending","post_credits"]
+    if chapter1 != expected_ch1 or chapter2 != ["chapter2_opening"]:
+        raise SystemExit("Canonical voice scene manifest is incomplete or out of order.")
 
     profiles = json.loads(PROFILES.read_text(encoding="utf-8"))
     characters = profiles.get("characters", {})
     settings = profiles.get("engine_arguments", {})
     if profiles.get("schema") != 1 or profiles.get("engine") != "espeak":
         raise SystemExit("Invalid canonical voice profile manifest.")
-    if int(settings.get("sample_rate", 0)) != 22050:
-        raise SystemExit("Canonical voice sample rate must remain 22050 Hz.")
+    if not {"amplitude", "gap", "sample_rate"}.issubset(settings) or int(settings["sample_rate"]) != 22050:
+        raise SystemExit("Invalid canonical voice engine settings.")
 
     source1 = CHAPTER_1.read_text(encoding="utf-8")
     speakers = set()
     for scene in chapter1:
-        speakers.update(s for s, _ in source_scene(source1, scene))
-
+        speakers.update(s for s, _ in source_scene(source1, scene, chapter1))
     source2 = CHAPTER_2.read_text(encoding="utf-8")
-    speakers.update(s for s, _ in LINE_NEW_DECL.findall(source2))
+    speakers.update(s for s, _ in LINE_NEW_DECL.finditer(source2))
     missing_profiles = sorted(speakers - set(characters))
     if missing_profiles:
         raise SystemExit("Missing canonical voice profiles: " + ", ".join(missing_profiles))
