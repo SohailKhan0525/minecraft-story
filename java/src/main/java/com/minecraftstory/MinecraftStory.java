@@ -28,6 +28,7 @@ public final class MinecraftStory implements ModInitializer {
 
         // Developer-only tools remain available for testing; normal gameplay never requires them.
         StoryCommands.register();
+        // Chapter 1 runtime continues to expand through ordinary in-world interaction.
     }
 
     public static Identifier id(String path) {
