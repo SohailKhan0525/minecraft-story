@@ -7,9 +7,9 @@ The project has one narrative specification and separate platform runtimes.
 | Platform | Runtime | Status |
 |---|---|---|
 | Windows/Linux/macOS | Minecraft Java 26.3 + Fabric | **Active Chapter 1 implementation** |
-| Android | Minecraft Bedrock add-on | **Separate port required** |
-| iPhone/iPad | Minecraft Bedrock add-on | **Separate port required** |
-| Xbox/PlayStation/Switch | Minecraft Bedrock add-on via supported world/Realm workflows | **Separate port required** |
+| Android | Minecraft Bedrock add-on | **Bedrock vertical slice added; parity in progress** |
+| iPhone/iPad | Minecraft Bedrock add-on | **Bedrock vertical slice added; parity in progress** |
+| Xbox/PlayStation/Switch | Minecraft Bedrock add-on via supported world/Realm workflows | **Bedrock vertical slice; parity in progress** |
 
 ## Why there cannot be one file for every device
 
@@ -35,4 +35,4 @@ Priorities for the Bedrock port:
 
 ## Current truth
 
-> Minecraft Story — Chapter 1 is implemented for Java/Fabric, with Bedrock/mobile/console as a separate port target.
+> Java/Fabric has the full Chapter 1 implementation. Bedrock now has a real scripted vertical slice with touch/controller-friendly dialogue and the Chapter 1 ending flow; full Chapter 1 parity is still in progress.
