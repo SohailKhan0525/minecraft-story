@@ -22,6 +22,9 @@ public final class StoryInteraction {
 
     public static void handleChoice(ServerPlayer player, String npcId, String choiceId) {
         StoryState state = StorySessionManager.state(player);
+        if (npcId.equals("mara") && !state.activeQuest().equals("A Bell Before Breakfast")) return;
+        if (npcId.equals("sera") && (!state.activeQuest().equals("Beneath the Roots") || state.questProgress() < 5)) return;
+        if (npcId.equals("crystal") && (!state.activeQuest().equals("The Heart of the Observatory") || state.questProgress() < 4)) return;
 
         switch (npcId + ":" + choiceId) {
             case "mara:light_yes" -> { Chapter1Story.chooseIntroduction(state, "saw_the_light"); state.setActiveQuest("Blue Fire"); }
