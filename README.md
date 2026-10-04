@@ -1,52 +1,41 @@
 # Minecraft Story
 
-An original, chapter-based story/RPG project for Minecraft.
+**Chapter 1 — The Night the Sky Broke**
 
-## Vision
+An original story-driven Minecraft adventure with spoken dialogue, quests, exploration, combat, choices, and a post-credit epilogue.
 
-Build an episodic Minecraft adventure that combines:
+## Download and play
 
-- story-driven exploration
-- NPCs and dialogue
-- quests and objectives
-- custom items and abilities
-- enemies and boss encounters
-- dungeons and puzzles
-- cinematic moments
-- persistent story progression
-- spoken story audio
+The public release contains ready-to-use builds:
 
-The long-term goal is to support both Minecraft: Java Edition and Minecraft: Bedrock Edition through platform-specific implementations that share the same story, lore, design, and content specifications.
+- Minecraft Java Edition: one .jar with the Chapter 1 voice audio already inside.
+- Minecraft Bedrock Edition: one .mcaddon with the behavior pack, resource pack, and voice audio already inside.
 
-## Current status
+No separate audio download is required.
 
-**Chapter 1 implementation in active development.**
+See docs/INSTALL.md for the simple player installation steps.
 
-Chapter 1: **The Night the Sky Broke**
+## Chapter 1
 
-The Java runtime is the primary implementation. The Bedrock runtime contains a separate playable implementation with touch/controller-friendly story UI and generated voice playback.
+Play from the river awakening through Havenfall, the Silent Forest, the Observatory, the Hollow Knight, the Heart, the ending, credits, and Mira's post-credit scene.
 
-The project now includes:
+The chapter ends at:
 
-- persistent Chapter 1 quest and story state;
-- physical world objectives and combat encounters on Java;
-- Bedrock scripted Chapter 1 progression;
-- generated synthetic voice performances for the main Chapter 1 scenes;
-- Java SoundEvent playback and narrator fallback;
-- Bedrock resource-pack sound definitions and player-local voice playback;
-- Chapter 1 ending, credits and Mira post-credit epilogue;
-- Chapter 2 preserved as a coming-soon endpoint.
+**TO BE CONTINUED — CHAPTER 2 COMING SOON**
 
-## Build / play
+## Voices
 
-See docs/PLAYING.md for a clean-machine installation guide.
+Chapter 1 uses generated spoken audio produced from the canonical dialogue with open-source eSpeak/FFmpeg tooling. The release builds contain the generated audio, so normal players do not need to generate anything.
 
-See docs/AUDIO.md for the voice/audio pipeline.
+## Platform model
 
-See:
-- docs/ROADMAP.md
-- docs/ARCHITECTURE.md
-- docs/PLATFORMS.md
-- docs/chapters/chapter-1/README.md
+Java Edition and Bedrock Edition are separate Minecraft runtimes, so each has its own release file. The story, dialogue, choices and audio design are shared between them.
+
+## Development
+
+- java/ — Fabric implementation
+- bedrock/ — Bedrock implementation
+- tools/ — voice generation, validation and packaging
+- docs/INSTALL.md — player install/play guide
 
 > This is an independent project and is not an official Minecraft product.
