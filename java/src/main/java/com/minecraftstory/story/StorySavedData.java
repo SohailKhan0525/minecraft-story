@@ -17,8 +17,11 @@ import java.util.UUID;
 public final class StorySavedData extends SavedData {
     private static final Codec<StoryPlayerData> PLAYER_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("activeQuest").forGetter(StoryPlayerData::activeQuest),
-            Codec.STRING.listOf().fieldOf("flags").forGetter(data -> data.flags().stream().toList())
-    ).apply(instance, (quest, flags) -> new StoryPlayerData(quest, Set.copyOf(flags))));
+            Codec.INT.optionalFieldOf("questProgress", 0).forGetter(StoryPlayerData::questProgress),
+            Codec.STRING.listOf().optionalFieldOf("flags", java.util.List.of()).forGetter(data -> data.flags().stream().toList()),
+            Codec.STRING.listOf().optionalFieldOf("completedQuests", java.util.List.of()).forGetter(data -> data.completedQuests().stream().toList())
+    ).apply(instance, (quest, progress, flags, completed) ->
+            new StoryPlayerData(quest, progress, Set.copyOf(flags), Set.copyOf(completed))));
 
     private static final Codec<StorySavedData> CODEC = Codec.unboundedMap(
             Codec.STRING, PLAYER_CODEC
@@ -55,8 +58,12 @@ public final class StorySavedData extends SavedData {
         StoryPlayerData data = players.get(playerId.toString());
         if (data == null) return state;
         if (!data.activeQuest().isBlank()) state.setActiveQuest(data.activeQuest());
+        state.setQuestProgress(data.questProgress());
         for (String name : data.flags()) {
             try { state.set(StoryFlag.valueOf(name)); } catch (IllegalArgumentException ignored) {}
+        }
+        for (String questId : data.completedQuests()) {
+            state.completeQuest(questId);
         }
         return state;
     }
@@ -64,9 +71,19 @@ public final class StorySavedData extends SavedData {
     public void save(UUID playerId, StoryState state) {
         Set<String> flags = new HashSet<>();
         for (StoryFlag flag : state.snapshot()) flags.add(flag.name());
-        players.put(playerId.toString(), new StoryPlayerData(state.activeQuest(), flags));
+        players.put(playerId.toString(), new StoryPlayerData(
+                state.activeQuest(),
+                state.questProgress(),
+                flags,
+                state.completedQuests()
+        ));
         setDirty();
     }
 
-    private record StoryPlayerData(String activeQuest, Set<String> flags) {}
+    private record StoryPlayerData(
+            String activeQuest,
+            int questProgress,
+            Set<String> flags,
+            Set<String> completedQuests
+    ) {}
 }
