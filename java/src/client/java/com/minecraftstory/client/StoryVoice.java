@@ -37,7 +37,7 @@ public final class StoryVoice {
     public static void speakFallback(String speaker, String text) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.getNarrator().isActive()) {
-            minecraft.getNarrator().narrate(Component.literal(speaker + ": " + text));
+            minecraft.getNarrator().saySystemNow(Component.literal(speaker + ": " + text));
         }
     }
 
