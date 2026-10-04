@@ -123,13 +123,36 @@ function blockText(d,text,x,y,z,block="gold_block"){
     cursor+=5;
   }
 }
+function patchWorldV3(d){
+  d.runCommand("fill 34 54 -11 49 54 20 deepslate");
+  d.runCommand("fill 34 55 -10 34 57 20 obsidian");
+  d.runCommand("fill 49 55 -10 49 57 20 obsidian");
+  d.runCommand("fill 34 58 -11 49 58 20 obsidian");
+  d.runCommand("fill 35 55 -9 48 57 19 air");
+  for(let i=0;i<12;i++){
+    const y=63-Math.floor(i/2), z=-18+i;
+    d.runCommand("setblock 38 "+y+" "+z+" polished_deepslate_stairs");
+    d.runCommand("setblock 37 "+y+" "+z+" cobbled_deepslate");
+    d.runCommand("setblock 39 "+y+" "+z+" cobbled_deepslate");
+  }
+  for(const [x,y,z,b] of [
+    [25,64,11,"lectern"],[33,64,1,"tripwire_hook"],[36,64,-6,"chiseled_deepslate"],
+    [35,64,-14,"polished_blackstone"],[39,64,-22,"cartography_table"],
+    [32,64,-25,"chiseled_stone_bricks"],[37,64,-16,"chiseled_stone_bricks"],[41,64,-9,"chiseled_stone_bricks"],
+    [38,54,-10,"cartography_table"],[35,55,-6,"gold_block"],[41,55,-4,"iron_block"],
+    [45,55,0,"crying_obsidian"],[42,56,-4,"amethyst_block"],[42,55,6,"iron_bars"],
+    [45,56,20,"crying_obsidian"],[45,57,20,"amethyst_block"]
+  ]) d.runCommand("setblock "+x+" "+y+" "+z+" "+b);
+  d.runCommand("fill -14 64 18 14 64 20 stone_bricks");
+  blockText(d,"CHAPTER 1",-13,65,18,"gold_block");
+  d.runCommand("setblock -14 64 17 glowstone");
+  world.setDynamicProperty(WORLD_VERSION,3);
+}
 function build(d){
   const version=Number(world.getDynamicProperty(WORLD_VERSION)??0);
-  if(world.getDynamicProperty(WORLD_MARK) && version>=2)return;
-  if(world.getDynamicProperty(WORLD_MARK) && version<2){
-    d.runCommand("fill -14 64 18 14 64 20 stone_bricks");
-    blockText(d,"CHAPTER 1",-13,65,18,"gold_block");
-    world.setDynamicProperty(WORLD_VERSION,2);
+  if(world.getDynamicProperty(WORLD_MARK) && version>=3)return;
+  if(world.getDynamicProperty(WORLD_MARK) && version<3){
+    patchWorldV3(d);
     return;
   }
   d.runCommand("fill -60 63 -50 60 63 38 grass_block");
@@ -141,6 +164,37 @@ function build(d){
   for(const p of ["7 65 7","11 65 7","7 65 11"]) d.runCommand("setblock "+p+" soul_fire");
   d.runCommand("fill 38 53 14 52 53 26 obsidian");
   d.runCommand("fill 39 54 15 51 56 25 air");
+  d.runCommand("fill 34 54 -11 49 54 20 deepslate");
+  d.runCommand("fill 34 55 -10 34 57 20 obsidian");
+  d.runCommand("fill 49 55 -10 49 57 20 obsidian");
+  d.runCommand("fill 34 58 -11 49 58 20 obsidian");
+  d.runCommand("fill 35 55 -9 48 57 19 air");
+  for(let i=0;i<12;i++){
+    const y=63-Math.floor(i/2);
+    const z=-18+i;
+    d.runCommand("setblock 38 "+y+" "+z polished_deepslate_stairs");
+    d.runCommand("setblock 37 "+y+" "+z cobbled_deepslate");
+    d.runCommand("setblock 39 "+y+" "+z cobbled_deepslate");
+  }
+  for(const [x,y,z,b] of [
+    [25,64,11,"lectern"],
+    [33,64,1,"tripwire_hook"],
+    [36,64,-6,"chiseled_deepslate"],
+    [35,64,-14,"polished_blackstone"],
+    [39,64,-22,"cartography_table"],
+    [32,64,-25,"chiseled_stone_bricks"],
+    [37,64,-16,"chiseled_stone_bricks"],
+    [41,64,-9,"chiseled_stone_bricks"],
+    [38,54,-10,"cartography_table"],
+    [35,55,-6,"gold_block"],
+    [41,55,-4,"iron_block"],
+    [45,55,0,"crying_obsidian"],
+    [42,56,-4,"amethyst_block"],
+    [42,55,6,"iron_bars"],
+    [45,56,20,"crying_obsidian"],
+    [45,57,20,"amethyst_block"]
+  ]) d.runCommand("setblock "+x+" "+y+" "+z+" "+b);
+  d.runCommand("fill 39 54 15 51 56 25 air");
   d.runCommand("setblock 45 56 20 crying_obsidian");
   d.runCommand("setblock 45 57 20 amethyst_block");
 
@@ -150,7 +204,7 @@ function build(d){
   blockText(d,"CHAPTER 1", -13, 65, 18, "gold_block");
   d.runCommand("setblock -14 64 17 glowstone");
   world.setDynamicProperty(WORLD_MARK,true);
-  world.setDynamicProperty(WORLD_VERSION,2);
+  world.setDynamicProperty(WORLD_VERSION,3);
 }
 async function intro(p){
   voice(p,"havenfall");
@@ -311,6 +365,8 @@ world.afterEvents.playerSpawn.subscribe(e=>{
       setStage(p,0);
       p.setDynamicProperty(VOICE_LAST,"");
       setCheckpoint(p,0);
+      p.teleport({x:-12.5,y:65,z:35.5});
+      title(p,"CHAPTER 1","The Night the Sky Broke");
       voice(p,"cold_open");
       title(p,"THE NIGHT THE SKY BROKE","CHAPTER 1 • Follow the river toward Havenfall.");
       tell(p,"The forest has gone silent.");
