@@ -23,6 +23,7 @@ public final class MinecraftStory implements ModInitializer {
         LOGGER.info("NPC count: {}", Chapter1Content.npcs().size());
         LOGGER.info("Quest count: {}", Chapter1Content.quests().size());
 
+        StoryItems.register();
         StoryNetwork.register();
         StoryWorld.register();
 
