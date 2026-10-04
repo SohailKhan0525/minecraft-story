@@ -1,5 +1,7 @@
 package com.minecraftstory.client;
 
+import com.minecraftstory.StorySounds;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
