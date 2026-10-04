@@ -90,6 +90,9 @@ processResources {
         expand "version": version
     }
 }
+tasks.configureEach {
+    if (name == "sourcesJar") dependsOn(tasks.named("generateStorySkins"))
+}
 tasks.withType(JavaCompile).configureEach {
     it.options.release = 25
 }

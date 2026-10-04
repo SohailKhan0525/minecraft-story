@@ -14,6 +14,7 @@ public final class DialogueScreen extends Screen {
     private final String npcId;
     private final String sceneId;
     private final Chapter1Content.Scene scene;
+    private int scrollOffset;
 
     public DialogueScreen(String npcId, String sceneId) {
         super(Component.literal("Chapter 1"));
@@ -81,9 +82,9 @@ public final class DialogueScreen extends Screen {
 
         int y = top + 24;
         List<Chapter1Content.Line> lines = scene.lines();
-        int shown = Math.min(lines.size(), hasChoice() ? 9 : 13);
+        int shown = Math.min(lines.size() - scrollOffset, hasChoice() ? 9 : 13);
         for (int i = 0; i < shown; i++) {
-            Chapter1Content.Line line = lines.get(i);
+            Chapter1Content.Line line = lines.get(i + scrollOffset);
             int color = line.speaker().equalsIgnoreCase(npcId) ? 0xFFE8D6A8 : 0xFFD0D4DE;
             graphics.text(this.font, Component.literal(line.speaker() + ": " + line.text()),
                     left, y, color, false);
@@ -94,6 +95,13 @@ public final class DialogueScreen extends Screen {
             graphics.text(this.font, Component.literal("Your choice will affect what happens later."),
                     left, this.height - 118, 0xFFB6BAC5, false);
         }
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        int maxOffset = Math.max(0, scene.lines().size() - (hasChoice() ? 9 : 13));
+        scrollOffset = (int) Math.max(0, Math.min(maxOffset, scrollOffset - Math.signum(verticalAmount)));
+        return true;
     }
 
     @Override

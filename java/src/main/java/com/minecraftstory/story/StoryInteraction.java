@@ -2,8 +2,13 @@ package com.minecraftstory.story;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class StoryInteraction {
+    private static final Map<UUID, Long> INTRO_COOLDOWN = new ConcurrentHashMap<>();
+
     private StoryInteraction() {}
 
     public static void open(ServerPlayer player, String npcId, String sceneId) {
@@ -13,6 +18,11 @@ public final class StoryInteraction {
     }
 
     public static void openIntroduction(ServerPlayer player) {
+        long now = player.level().getGameTime();
+        long last = INTRO_COOLDOWN.getOrDefault(player.getUUID(), Long.MIN_VALUE);
+        if (now - last < 200) return;
+        INTRO_COOLDOWN.put(player.getUUID(), now);
+
         StoryState state = StorySessionManager.state(player);
         if (state.has(StoryFlag.INTRO_STARTED) || state.has(StoryFlag.INTRO_LIGHT_SEEN) || state.has(StoryFlag.INTRO_MEMORY_MISSING) || state.has(StoryFlag.INTRO_LIGHT_DENIED)) return;
         state.set(StoryFlag.INTRO_STARTED);
