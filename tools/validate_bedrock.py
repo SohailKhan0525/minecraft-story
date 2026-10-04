@@ -27,11 +27,16 @@ def main() -> int:
         raise SystemExit("Bedrock resource pack has no resources module.")
 
     expected = ["cold_open","havenfall","chapel","missing_sound","silent_forest",
-                "observatory","first_choice","door_below","heart","ending","post_credits"]
+                "observatory","first_choice","door_below","heart","ending","post_credits",
+                "chapter2_opening"]
     for scene in expected:
         key = "minecraftstory:voice." + scene
         if key not in sd.get("sound_definitions", {}):
             raise SystemExit("Missing sound definition: " + key)
+
+    profiles = json.loads((ROOT / "audio/voice_profiles.json").read_text(encoding="utf-8"))
+    if profiles.get("schema") != 1 or not profiles.get("characters"):
+        raise SystemExit("Shared voice profile manifest is missing or invalid.")
 
     js = (BP / "scripts/main.js").read_text(encoding="utf-8")
     if "playSound" not in js or "minecraftstory:voice." not in js:
