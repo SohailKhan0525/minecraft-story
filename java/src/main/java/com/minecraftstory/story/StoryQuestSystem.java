@@ -119,7 +119,7 @@ public final class StoryQuestSystem {
             }
             case "elias" -> {
                 if ("Find Elias".equals(state.activeQuest()) && state.questProgress() >= 5) {
-                    player.sendSystemMessage(Component.literal("Elias: \\"You actually followed the trail.\\""), true);
+                    player.sendSystemMessage(Component.literal("Elias: You actually followed the trail."), true);
                     complete(player, state, "Beneath the Roots");
                 }
             }
