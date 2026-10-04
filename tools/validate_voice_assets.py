@@ -51,7 +51,7 @@ def check_ogg(path: Path) -> None:
          "-of", "csv=p=0", str(path)],
         text=True, capture_output=True, check=True
     )
-    codec, channels, sample_rate = r.stdout.strip().split(",")
+    codec, sample_rate, channels = r.stdout.strip().split(",")
     if codec != "vorbis" or channels != "1" or sample_rate != "22050":
         raise SystemExit(f"Expected mono 22050 Hz OGG Vorbis: {path} ({r.stdout.strip()})")
 
