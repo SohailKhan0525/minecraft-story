@@ -6,6 +6,8 @@ An original story-driven Minecraft adventure with spoken dialogue, quests, explo
 
 ## Download and play
 
+Release pipeline: v1.0.0 is built and published only after GitHub Actions validation passes.
+
 The public release contains ready-to-use builds:
 
 - Minecraft Java Edition: one .jar with the Chapter 1 voice audio already inside.
