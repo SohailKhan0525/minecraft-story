@@ -43,6 +43,18 @@ public final class StoryState {
         questProgress = progress;
     }
 
+    public boolean isChapter1Complete() {
+        return has(StoryFlag.CHAPTER_1_COMPLETE);
+    }
+
+    public boolean isChapter2Unlocked() {
+        return has(StoryFlag.CHAPTER_2_UNLOCKED);
+    }
+
+    public void resetQuestProgress() {
+        questProgress = 0;
+    }
+
     public void completeQuest(String questId) {
         if (questId != null && !questId.isBlank()) completedQuests.add(questId);
     }
