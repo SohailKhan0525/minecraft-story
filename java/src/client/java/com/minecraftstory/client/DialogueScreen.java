@@ -2,6 +2,7 @@ package com.minecraftstory.client;
 
 import com.minecraftstory.story.Chapter1Content;
 import com.minecraftstory.story.StoryNetwork;
+import com.minecraftstory.StorySounds;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
