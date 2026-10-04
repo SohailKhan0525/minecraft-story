@@ -126,6 +126,12 @@ function blockText(d,text,x,y,z,block="gold_block"){
 function build(d){
   const version=Number(world.getDynamicProperty(WORLD_VERSION)??0);
   if(world.getDynamicProperty(WORLD_MARK) && version>=2)return;
+  if(world.getDynamicProperty(WORLD_MARK) && version<2){
+    d.runCommand("fill -14 64 18 14 64 20 stone_bricks");
+    blockText(d,"CHAPTER 1",-13,65,18,"gold_block");
+    world.setDynamicProperty(WORLD_VERSION,2);
+    return;
+  }
   d.runCommand("fill -60 63 -50 60 63 38 grass_block");
   d.runCommand("fill -60 64 28 60 64 33 water");
   d.runCommand("fill -60 64 27 60 64 27 sand");
@@ -181,8 +187,8 @@ function spawnWave(p,count,name,tag=WAVE_TAG){
     e.addTag(tag);
   }
 }
-function waveAlive(d){
-  return d.getEntities({tags:[WAVE_TAG]}).length;
+function waveAlive(p){
+  return p.dimension.getEntities({tags:[WAVE_TAG]}).some(e=>distanceSq(e.location,p.location)<=900);
 }
 function ending(p){
   title(p,"CREDITS","Minecraft Story • Chapter 1");
@@ -326,6 +332,6 @@ system.runInterval(()=>{
     if(stage(p)>=18)continue;
     build(p.dimension);
     advanceStory(p);
-    if(stage(p)===13 && !waveAlive(p.dimension))advanceStory(p);
+    if(stage(p)===13 && !waveAlive(p))advanceStory(p);
   }
 },20);
