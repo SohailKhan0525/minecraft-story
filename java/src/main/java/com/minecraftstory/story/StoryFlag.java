@@ -1,6 +1,7 @@
 package com.minecraftstory.story;
 
 public enum StoryFlag {
+    INTRO_STARTED,
     INTRO_LIGHT_SEEN,
     INTRO_MEMORY_MISSING,
     INTRO_LIGHT_DENIED,
