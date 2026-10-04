@@ -15,6 +15,7 @@ public final class DialogueScreen extends Screen {
     private final String sceneId;
     private final Chapter1Content.Scene scene;
     private int scrollOffset;
+    private boolean voiceStarted;
 
     public DialogueScreen(String npcId, String sceneId) {
         super(Component.literal("Chapter 1"));
@@ -75,6 +76,11 @@ public final class DialogueScreen extends Screen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         super.extractRenderState(graphics, mouseX, mouseY, delta);
+        if (!voiceStarted && !scene.lines().isEmpty()) {
+            voiceStarted = true;
+            Chapter1Content.Line first = scene.lines().get(0);
+            StoryVoice.speak(first.speaker(), first.text());
+        }
 
         int left = 24;
         int top = 28;
