@@ -3,6 +3,8 @@ package com.minecraftstory.story;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,7 +35,7 @@ public final class StoryQuestSystem {
         // Keep world checks cheap while retaining responsive objective progression.
         if (ticks % 5 != 0) return;
 
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         int progress = state.questProgress();
 
         switch (quest) {
@@ -64,12 +66,12 @@ public final class StoryQuestSystem {
             }
             case "sera" -> {
                 if ("Beneath the Roots".equals(state.activeQuest()) && state.questProgress() >= 5) {
-                    player.displayClientMessage(Component.literal("Sera is waiting. Choose whether to rescue her or follow the archive."), true);
+                    player.sendSystemMessage(Component.literal("Sera is waiting. Choose whether to rescue her or follow the archive."), true);
                 }
             }
             case "crystal" -> {
                 if ("The Heart of the Observatory".equals(state.activeQuest()) && state.questProgress() >= 4) {
-                    player.displayClientMessage(Component.literal("The crystal is waiting for your decision."), true);
+                    player.sendSystemMessage(Component.literal("The crystal is waiting for your decision."), true);
                 }
             }
             default -> {}
@@ -189,10 +191,10 @@ public final class StoryQuestSystem {
     private static void spawnGuardians(ServerLevel level, ServerPlayer player, int count) {
         if (count <= 0) return;
         for (int i = 0; i < count; i++) {
-            LivingEntity entity = EntityType.RAVAGER.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            LivingEntity entity = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "ravager")).create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             if (entity == null) continue;
             entity.setPos(player.getX() + 3 + i * 2, player.getY(), player.getZ() + 5);
-            entity.setCustomName(Component.literal(i == 0 ? "Hollow Knight" : "Knight's Echo"));
+            entity.setCustomName(Component.literal(i == 0 ? "Hollow Knight" : "Knights Echo"));
             entity.setCustomNameVisible(true);
             entity.addTag("minecraftstory_hollow_knight");
             if (entity instanceof Mob mob) mob.setTarget(player);
@@ -202,7 +204,7 @@ public final class StoryQuestSystem {
 
     private static void spawnWave(ServerLevel level, ServerPlayer player, int count, String tag) {
         for (int i = 0; i < Math.max(0, count); i++) {
-            LivingEntity entity = EntityType.ZOMBIE.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            LivingEntity entity = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "zombie")).create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             if (entity == null) continue;
             entity.setPos(player.getX() + 3 + i * 1.5, player.getY(), player.getZ() + 6);
             entity.setCustomName(Component.literal("Deep Warden Spawn"));
@@ -217,7 +219,12 @@ public final class StoryQuestSystem {
         return level.getEntitiesOfClass(Mob.class,
                 new net.minecraft.world.phys.AABB(player.getX() - 24, player.getY() - 10, player.getZ() - 24,
                         player.getX() + 24, player.getY() + 10, player.getZ() + 24))
-                .stream().noneMatch(m -> m.getTags().contains(tag) && !m.isDeadOrDying());
+                .stream().noneMatch(m -> !m.isDeadOrDying() && (
+                        (tag.equals("minecraftstory_hollow_knight") && m.getCustomName() != null
+                                && (m.getCustomName().getString().equals("Hollow Knight") || m.getCustomName().getString().equals("Knights Echo")))
+                        || (tag.equals("minecraftstory_heart_wave") && m.getCustomName() != null
+                                && m.getCustomName().getString().equals("Deep Warden Spawn"))
+                ));
     }
 
     private static int maxProgress(ServerPlayer p, StoryState s, int value, String text) {
@@ -234,7 +241,7 @@ public final class StoryQuestSystem {
     private static void setProgress(ServerPlayer p, StoryState s, int value, String text) {
         s.setQuestProgress(value);
         int target = StoryQuest.objectives(currentQuestId(s)).size();
-        p.displayClientMessage(Component.literal("Quest: " + s.activeQuest() + " [" + value + "/" + target + "] — " + text), true);
+        p.sendSystemMessage(Component.literal("Quest: " + s.activeQuest() + " [" + value + "/" + target + "] — " + text), true);
         StorySessionManager.save(p);
     }
 
@@ -242,11 +249,11 @@ public final class StoryQuestSystem {
         String currentId = questId(s.activeQuest());
         if (currentId != null) s.completeQuest(currentId);
         String finished = s.activeQuest();
-        p.displayClientMessage(Component.literal("Quest complete: " + finished), true);
+        p.sendSystemMessage(Component.literal("Quest complete: " + finished), true);
         if (nextQuest == null || nextQuest.equals(s.activeQuest())) {
             s.set(StoryFlag.CHAPTER_1_COMPLETE);
             s.set(StoryFlag.CHAPTER_2_UNLOCKED);
-            p.displayClientMessage(Component.literal("Chapter 1 complete — Chapter 2 unlocked."), true);
+            p.sendSystemMessage(Component.literal("Chapter 1 complete — Chapter 2 unlocked."), true);
         } else {
             s.setActiveQuest(nextQuest);
             s.setQuestProgress(0);
