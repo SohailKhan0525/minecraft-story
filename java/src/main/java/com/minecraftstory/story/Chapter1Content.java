@@ -26,7 +26,7 @@ public final class Chapter1Content {
             l("Wanderer","Who said that?","fear")
         );
 
-        scene("havenfall", "A Village That Heard Something", 480,
+        scene("havenfall", "A Village That Heard Something", 360,
             l("Mara","Stop there. Hands where I can see them.","guarded"),
             l("Wanderer","I don't remember how I got here.","disoriented"),
             l("Mara","Convenient.","dry"),
@@ -51,7 +51,7 @@ public final class Chapter1Content {
             l("Mara","Come inside. Before something else falls out of the sky.","serious")
         );
 
-        scene("chapel", "The Blue Fire", 360,
+        scene("chapel", "The Blue Fire", 300,
             l("Cael","Do not touch the flame.","urgent"),
             l("Wanderer","It's cold.","surprised"),
             l("Cael","I know.","worried"),
@@ -70,7 +70,7 @@ public final class Chapter1Content {
             l("Cael","Because I know when silence is listening.","ominous")
         );
 
-        scene("missing_sound", "The Missing Sound", 300,
+        scene("missing_sound", "The Missing Sound", 240,
             l("Mara","Everyone stop.","commanding"),
             l("Elias","What?","confused"),
             l("Mara","Listen.","tense"),
@@ -85,7 +85,7 @@ public final class Chapter1Content {
             l("Mara","Then we take him back.","determined")
         );
 
-        scene("silent_forest", "The Silent Forest", 420,
+        scene("silent_forest", "The Silent Forest", 300,
             l("Mara","Stay close.","commanding"),
             l("Wanderer","There's no birds.","uneasy"),
             l("Sera","You two always walk this loudly?","dry"),
@@ -104,7 +104,7 @@ public final class Chapter1Content {
             l("Elias","If anyone has a plan, now would be fantastic.","nervous")
         );
 
-        scene("observatory", "Beneath the Roots", 600,
+        scene("observatory", "Beneath the Roots", 420,
             l("Elias","Look at this wall.","awed"),
             l("Wanderer","Those are stars.","quiet"),
             l("Elias","No. They're positions.","excited"),
@@ -131,7 +131,7 @@ public final class Chapter1Content {
             l("Sera","If the ruin starts whispering, we leave.","dry",true)
         );
 
-        scene("first_choice", "The First Choice", 360,
+        scene("first_choice", "The First Choice", 300,
             l("Sera","The lower passage is collapsing.","urgent"),
             l("Mara","Sera is still inside.","determined"),
             l("Wanderer","Then we go back.","firm"),
@@ -148,7 +148,7 @@ public final class Chapter1Content {
             l("Sera","Exactly. Expensive.","deadpan",true)
         );
 
-        scene("door_below", "The Door Beneath the World", 420,
+        scene("door_below", "The Door Beneath the World", 360,
             l("Elias","Ash Lens goes here.","focused"),
             l("Mara","Star-Iron there.","focused"),
             l("Cael","And the Warden Seal in the center.","quiet"),
@@ -169,7 +169,7 @@ public final class Chapter1Content {
             l("Hollow Knight","Remembering.","unnatural")
         );
 
-        scene("heart", "The Heart of the Observatory", 600,
+        scene("heart", "The Heart of the Observatory", 420,
             l("Elias","This is beautiful.","awed"),
             l("Sera","That's a dangerous thing to say underground.","dry",true),
             l("Mara","Eleven seats.","quiet"),
@@ -196,7 +196,7 @@ public final class Chapter1Content {
             l("Wanderer","Wonderful.","flat",true)
         );
 
-        scene("ending", "The Night Is Not Over", 240,
+        scene("ending", "The Night Is Not Over", 180,
             l("Narrator","The crystal screamed without making a sound.","horror"),
             l("Wanderer","Stay back!","urgent"),
             l("Mara","What did you do?","shaken"),
