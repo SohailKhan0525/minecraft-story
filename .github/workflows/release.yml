@@ -193,12 +193,6 @@ jobs:
         run: python tools/generate_story_audio.py
       - name: Validate every generated voice asset
         run: python tools/validate_voice_assets.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: voice-assets-${{ needs.prepare.outputs.version }}
-          path: |
-            java/src/main/resources/assets/minecraftstory/sounds/voice
-            bedrock/resource_packs/minecraft_story/sounds/minecraftstory/voice
 
   package:
     needs: [prepare, java, bedrock, voice]
@@ -221,10 +215,11 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.6.0'
-      - uses: actions/download-artifact@v5
-        with:
-          name: voice-assets-${{ needs.prepare.outputs.version }}
-          path: .
+      - name: Install open-source TTS/audio tools
+        run: sudo apt-get update && sudo apt-get install -y espeak ffmpeg
+
+      - name: Generate bundled Chapter 1 and Chapter 2 voices
+        run: python tools/generate_story_audio.py
       - name: Final repository audit
         run: python tools/validate_repository.py
       - name: Final generated voice validation
