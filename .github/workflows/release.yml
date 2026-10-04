@@ -278,6 +278,7 @@ jobs:
             This is independent Minecraft content and is not affiliated with Mojang or Microsoft.
           files: |
             release/minecraft-story-java-${{ needs.prepare.outputs.version }}.jar
+            release/minecraft-story-bedrock-world-${{ needs.prepare.outputs.version }}.mcworld
             release/minecraft-story-bedrock-${{ needs.prepare.outputs.version }}.mcaddon
             release/minecraft-story-behavior-${{ needs.prepare.outputs.version }}.mcpack
             release/minecraft-story-resources-${{ needs.prepare.outputs.version }}.mcpack
