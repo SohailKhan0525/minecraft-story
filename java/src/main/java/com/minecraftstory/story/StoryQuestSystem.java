@@ -60,7 +60,7 @@ public final class StoryQuestSystem {
                 }
             }
             case "cael" -> {
-                if ("Blue Fire".equals(state.activeQuest()) && state.questProgress() >= 4) complete(player, state, "Find Elias");
+                if ("Blue Fire".equals(state.activeQuest()) && state.questProgress() >= 4) { setProgress(player, state, 5, "Cael listens in silence."); complete(player, state, "Find Elias"); }
             }
             case "sera" -> {
                 if ("Beneath the Roots".equals(state.activeQuest()) && state.questProgress() >= 5) {
@@ -108,7 +108,7 @@ public final class StoryQuestSystem {
             if (in(p, 11, 7, 13, 9)) progress = maxProgress(p, s, 3, "The second flame whispers.");
             if (in(p, 7, 11, 9, 13)) progress = maxProgress(p, s, 4, "The third flame answers from underground.");
         }
-        if (progress >= 4 && in(p, 5, 5, 15, 15)) complete(p, s, "Find Elias");
+
     }
 
     private static void progressElias(ServerPlayer p, StoryState s, int progress) {
@@ -128,7 +128,6 @@ public final class StoryQuestSystem {
         if (in(p, 35, -19, 39, -14)) maxProgress(p, s, 3, "Ancient stone: ELEVEN KNEELED.");
         if (in(p, 39, -12, 43, -7)) maxProgress(p, s, 4, "Ancient stone: ONE REMAINED.");
         if (progress < 5 && in(p, 33, -25, 43, -15)) advance(p, s, 5, "The buried Observatory is ahead.");
-        if (progress >= 5 && in(p, 35, -16, 45, -8)) complete(p, s, "The Door Beneath the World");
     }
 
     private static void progressDoor(ServerPlayer p, StoryState s, int progress) {
@@ -162,11 +161,18 @@ public final class StoryQuestSystem {
         if (progress == 1 && !HEART_WAVES_SPAWNED.getOrDefault(p.getUUID(), false)) {
             HEART_WAVES_SPAWNED.put(p.getUUID(), true);
             spawnWave(level, p, d.combatCount(), "minecraftstory_heart_wave");
-            advance(p, s, 2, "First defense survived.");
-        } else if (progress == 2 && noTaggedMobs(level, p, "minecraftstory_heart_wave")) {
+        } else if (progress == 1 && HEART_WAVES_SPAWNED.getOrDefault(p.getUUID(), false)
+                && noTaggedMobs(level, p, "minecraftstory_heart_wave")) {
+            HEART_WAVES_SPAWNED.remove(p.getUUID());
+            advance(p, s, 2, "First defense defeated.");
+        } else if (progress == 2 && !HEART_WAVES_SPAWNED.getOrDefault(p.getUUID(), false)) {
+            HEART_WAVES_SPAWNED.put(p.getUUID(), true);
             spawnWave(level, p, d.combatCount() + 1, "minecraftstory_heart_wave");
-            advance(p, s, 3, "Second defense begins.");
-        } else if (progress == 3 && noTaggedMobs(level, p, "minecraftstory_heart_wave")) {
+        } else if (progress == 2 && HEART_WAVES_SPAWNED.getOrDefault(p.getUUID(), false)
+                && noTaggedMobs(level, p, "minecraftstory_heart_wave")) {
+            HEART_WAVES_SPAWNED.remove(p.getUUID());
+            advance(p, s, 3, "Second defense defeated.");
+        } else if (progress == 3 && in(p, 42, 17, 48, 23)) {
             advance(p, s, 4, "The black crystal is exposed.");
         }
 
@@ -176,7 +182,8 @@ public final class StoryQuestSystem {
         if (progress < 1 && in(p, 35, -12, 49, 0)) advance(p, s, 1, "You escape the collapsing ruins.");
         if (progress < 2 && in(p, 27, -30, 43, -5)) advance(p, s, 2, "The forest is behind you.");
         if (progress < 3 && in(p, -20, 17, 20, 30)) advance(p, s, 3, "The river is safe.");
-        if (progress >= 3 && in(p, -30, -5, 30, 5)) complete(p, s, "The Night Is Not Over");
+        if (progress < 4 && in(p, -30, -5, 30, 5)) advance(p, s, 4, "Havenfall is ahead.");
+        if (progress >= 4 && in(p, -30, -5, 30, 5)) complete(p, s, "The Night Is Not Over");
     }
 
     private static void spawnGuardians(ServerLevel level, ServerPlayer player, int count) {
@@ -234,7 +241,8 @@ public final class StoryQuestSystem {
     private static void complete(ServerPlayer p, StoryState s, String nextQuest) {
         String currentId = questId(s.activeQuest());
         if (currentId != null) s.completeQuest(currentId);
-        p.displayClientMessage(Component.literal("Quest complete: " + s.activeQuest()), true);
+        String finished = s.activeQuest();
+        p.displayClientMessage(Component.literal("Quest complete: " + finished), true);
         if (nextQuest == null || nextQuest.equals(s.activeQuest())) {
             s.set(StoryFlag.CHAPTER_1_COMPLETE);
             s.set(StoryFlag.CHAPTER_2_UNLOCKED);
