@@ -1,17 +1,67 @@
 # Bedrock Edition
 
-This folder contains the Bedrock runtime for Minecraft Story.
+This folder contains the Minecraft Bedrock Edition runtime for Minecraft Story.
 
-## Current build
+## Chapter 1
 
-The behavior pack contains a playable scripted vertical slice of Chapter 1: opening, Mara dialogue choices, blue-fire objective, Elias encounter, Sera choice, Heart choice, credits, Mira epilogue and the Chapter 2 coming-soon ending.
+Chapter 1 — **The Night the Sky Broke** — now includes:
 
-It is intentionally separate from the Java Fabric mod. Full Bedrock parity for the physical quest world, custom entities, combat phases, audio and cinematic camera work remains the next port milestone.
+- scripted opening and story progression;
+- Mara and Sera choice forms;
+- physical story locations;
+- Heart defense/memory flow;
+- final crystal choice;
+- credits and Mira post-credit scene;
+- Chapter 2 coming-soon endpoint;
+- generated spoken voice audio through a Bedrock resource pack.
+
+The Bedrock implementation is separate from the Java Fabric mod because the two Minecraft editions use different runtime systems.
+
+## Packs
+
+Behavior pack:
+
+`bedrock/behavior_packs/minecraft_story/`
+
+Resource pack:
+
+`bedrock/resource_packs/minecraft_story/`
+
+The behavior pack declares the voice resource-pack dependency. The resource pack contains the OGG performances and sound definitions.
 
 ## Install
 
-Import the behavior-pack manifest as a Bedrock Add-On. Microsoft documents `.mcpack`/`.mcworld` import on Windows, Android and iOS, plus supported console/Realm workflows.
+For a normal player, use the generated `.mcaddon` artifact from the repository's **Audio and playable builds** workflow.
 
-The script currently targets stable Bedrock Script API versions `@minecraft/server 2.10.0` and `@minecraft/server-ui 2.2.0`.
+1. Open the `.mcaddon` file with Minecraft Bedrock.
+2. Let Minecraft import both packs.
+3. Create a new world.
+4. Activate **Minecraft Story — The Night the Sky Broke** under Behavior Packs.
+5. Activate **Minecraft Story — Chapter 1 Voice Pack** under Resource Packs.
+6. Enter the new world.
+7. Keep game audio enabled.
 
-For a polished public release, package this folder as a `.mcpack` and test it on the target Bedrock release before distribution.
+Windows, Android and iOS can use the normal Bedrock import path. Console use depends on the supported Bedrock world/add-on distribution workflow on that platform.
+
+## Voice audio
+
+Bedrock calls the player's sound API using custom sound IDs declared by the resource pack. The same scene performances are produced by:
+
+`tools/generate_story_audio.py`
+
+The audio is synthetic original speech, not a human actor recording or a recognizable actor clone.
+
+## Packaging
+
+Run:
+
+```bash
+python tools/generate_story_audio.py
+python tools/package_bedrock_addon.py
+```
+
+This creates `dist/minecraft-story-chapter-1.mcaddon`.
+
+## Current limitation
+
+The Bedrock runtime is designed for Chapter 1 compatibility across Bedrock devices, but console-specific distribution and every hardware/OS combination still require real-device validation. The repository does not claim universal console certification from source review alone.
