@@ -143,6 +143,14 @@ public final class StoryQuestSystem {
                     }
                 }
             }
+            case "The Heart of the Observatory" -> {
+                if (pos.equals(new net.minecraft.core.BlockPos(45, 56, 20)) && state.questProgress() >= 4) {
+                    player.sendSystemMessage(net.minecraft.network.chat.Component.literal(
+                            "The Heart waits for you. Seal it, touch it, or try to destroy it."
+                    ), true);
+                    StoryInteraction.open(player, "crystal", "heart");
+                }
+            }
             case "The Door Beneath the World" -> {
                 if (pos.equals(new net.minecraft.core.BlockPos(35, 55, -6)) && state.questProgress() == 0) {
                     StoryItems.give(player, StoryItems.ASH_LENS);
