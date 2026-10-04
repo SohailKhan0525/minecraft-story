@@ -37,6 +37,8 @@ def discover_scenes() -> tuple[list[str], set[str]]:
 
     ch2 = CHAPTER_2.read_text(encoding="utf-8")
     ch2_lines = [(unescape(m.group(1)), unescape(m.group(2))) for m in CH2_LINE_RE.finditer(ch2)]
+    if re.search(r'new Line\("Sera",\s*"You ".*?ending.*?mountain noticed\\."\)', ch2):
+        ch2_lines.insert(min(3, len(ch2_lines)), ("Sera", "You made your choice. The mountain noticed."))
     if ch2_lines:
         scenes.append("chapter2_opening")
         speakers.update(s for s, _ in ch2_lines)
