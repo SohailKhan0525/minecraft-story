@@ -40,7 +40,7 @@ public final class StoryHud {
 
         graphics.fill(x, y, x + width, y + height, 0xCC111318);
         graphics.outline(x, y, width, height, 0xFF6E7785);
-        graphics.text(minecraft.font, Component.literal("CHAPTER 1"), x + 10, y + 7, 0xFFD7B56D, true);
+        graphics.text(minecraft.font, Component.literal(quest.startsWith("The First Star") || quest.startsWith("Ashes") || quest.startsWith("The Cartographer") || quest.startsWith("Beneath the Four") || quest.startsWith("The Returning") ? "CHAPTER 2" : "CHAPTER 1"), x + 10, y + 7, 0xFFD7B56D, true);
         graphics.text(minecraft.font,
                 Component.literal(quest + "  [" + progress + "/" + target + "]"),
                 x + 10, y + 20, 0xFFFFFFFF, true);
