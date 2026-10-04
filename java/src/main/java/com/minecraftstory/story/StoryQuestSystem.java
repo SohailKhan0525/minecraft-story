@@ -191,8 +191,8 @@ public final class StoryQuestSystem {
     private static void spawnGuardians(ServerLevel level, ServerPlayer player, int count) {
         if (count <= 0) return;
         for (int i = 0; i < count; i++) {
-            LivingEntity entity = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "ravager")).create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-            if (entity == null) continue;
+            var spawned = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "ravager")).create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            if (!(spawned instanceof LivingEntity entity)) continue;
             entity.setPos(player.getX() + 3 + i * 2, player.getY(), player.getZ() + 5);
             entity.setCustomName(Component.literal(i == 0 ? "Hollow Knight" : "Knights Echo"));
             entity.setCustomNameVisible(true);
@@ -204,8 +204,8 @@ public final class StoryQuestSystem {
 
     private static void spawnWave(ServerLevel level, ServerPlayer player, int count, String tag) {
         for (int i = 0; i < Math.max(0, count); i++) {
-            LivingEntity entity = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "zombie")).create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-            if (entity == null) continue;
+            var spawned = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "zombie")).create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            if (!(spawned instanceof LivingEntity entity)) continue;
             entity.setPos(player.getX() + 3 + i * 1.5, player.getY(), player.getZ() + 6);
             entity.setCustomName(Component.literal("Deep Warden Spawn"));
             entity.setCustomNameVisible(false);
