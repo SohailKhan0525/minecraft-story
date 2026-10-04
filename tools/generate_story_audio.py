@@ -31,11 +31,15 @@ LINE_NEW_DECL = re.compile(r'new Line\("((?:\\\\.|[^"])*)",\s*"((?:\\\\.|[^"])*)
 def unescape_java(value: str) -> str:
     return value.replace('\\\\', '\\').replace('\\\"', '"')
 
-def load_profiles() -> dict:
+def load_profiles() -> tuple[dict, dict]:
     data = json.loads(PROFILES_PATH.read_text(encoding="utf-8"))
     if data.get("schema") != 1 or data.get("engine") != "espeak":
         raise SystemExit("Unsupported voice profile manifest.")
-    return data["characters"]
+    settings = data.get("engine_arguments", {})
+    required = {"amplitude", "gap", "sample_rate"}
+    if not required.issubset(settings):
+        raise SystemExit("Voice profile manifest is missing engine arguments.")
+    return data["characters"], settings
 
 def parse_chapter_1() -> list[tuple[str, list[tuple[str, str]]]]:
     source = CHAPTER_1.read_text(encoding="utf-8")
@@ -65,15 +69,15 @@ def verify_speakers(scenes: list[tuple[str, list[tuple[str, str]]]], profiles: d
     if missing:
         raise SystemExit("Missing canonical voice profiles for: " + ", ".join(missing))
 
-def synthesize(text: str, speaker: str, wav_path: Path, profiles: dict) -> None:
+def synthesize(text: str, speaker: str, wav_path: Path, profiles: dict, settings: dict) -> None:
     profile = profiles[speaker]
     subprocess.run([
         "espeak",
         "-v", profile["voice"],
         "-s", str(profile["rate"]),
         "-p", str(profile["pitch"]),
-        "-a", "92",
-        "-g", "3",
+        "-a", str(settings["amplitude"]),
+        "-g", str(settings["gap"]),
         "-w", str(wav_path),
         text,
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -92,20 +96,20 @@ def concat_wavs(paths: list[Path], out_path: Path) -> None:
         for frame in frames:
             out.writeframes(frame)
 
-def generate_scene(scene_id: str, lines: list[tuple[str, str]], profiles: dict) -> int:
+def generate_scene(scene_id: str, lines: list[tuple[str, str]], profiles: dict, settings: dict) -> int:
     with tempfile.TemporaryDirectory(prefix="minecraft-story-voice-") as tmp:
         tmpdir = Path(tmp)
         silence = tmpdir / "silence.wav"
         with wave.open(str(silence), "wb") as w:
             w.setnchannels(1)
             w.setsampwidth(2)
-            w.setframerate(22050)
+            w.setframerate(int(settings["sample_rate"]))
             w.writeframes(b"\0\0" * int(22050 * 0.18))
 
         parts = []
         for i, (speaker, text) in enumerate(lines):
             line = tmpdir / f"{i:03d}.wav"
-            synthesize(text, speaker, line, profiles)
+            synthesize(text, speaker, line, profiles, settings)
             parts.extend([line, silence])
 
         combined = tmpdir / "combined.wav"
@@ -117,7 +121,7 @@ def generate_scene(scene_id: str, lines: list[tuple[str, str]], profiles: dict) 
 
         subprocess.run([
             "ffmpeg", "-y", "-loglevel", "error", "-i", str(combined),
-            "-ac", "1", "-ar", "22050", "-c:a", "libvorbis", "-q:a", "3",
+            "-ac", "1", "-ar", str(settings["sample_rate"]), "-c:a", "libvorbis", "-q:a", "3",
             str(java_file)
         ], check=True)
         shutil.copy2(java_file, BEDROCK_OUT / java_file.name)
@@ -126,7 +130,7 @@ def generate_scene(scene_id: str, lines: list[tuple[str, str]], profiles: dict) 
 def main() -> int:
     require_tool("espeak")
     require_tool("ffmpeg")
-    profiles = load_profiles()
+    profiles, settings = load_profiles()
     scenes = parse_chapter_1() + parse_chapter_2()
     if not scenes:
         raise SystemExit("No story scenes were parsed.")
@@ -135,7 +139,7 @@ def main() -> int:
     total = 0
     print(f"Generating {len(scenes)} deterministic story voice performances...")
     for scene_id, lines in scenes:
-        size = generate_scene(scene_id, lines, profiles)
+        size = generate_scene(scene_id, lines, profiles, settings)
         total += size
         print(f"  {scene_id}: {len(lines)} lines, {size:,} bytes")
     print(f"Done. Generated {total:,} bytes of OGG voice assets.")
