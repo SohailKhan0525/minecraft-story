@@ -20,6 +20,7 @@ public final class StoryQuestSystem {
     private static final Map<UUID, Boolean> HEART_WAVES_SPAWNED = new ConcurrentHashMap<>();
     private static final Map<UUID, Boolean> KNIGHT_FRACTURE_SPAWNED = new ConcurrentHashMap<>();
     private static final Map<UUID, Boolean> KNIGHT_MEMORY_SPAWNED = new ConcurrentHashMap<>();
+    private static final Map<UUID, Integer> POST_CREDITS_TICKS = new ConcurrentHashMap<>();
 
     private StoryQuestSystem() {}
 
@@ -30,8 +31,15 @@ public final class StoryQuestSystem {
 
     public static void tick(ServerPlayer player) {
         StoryState state = StorySessionManager.state(player);
+        if (state.has(StoryFlag.CHAPTER_1_COMPLETE)) {
+            int post = POST_CREDITS_TICKS.merge(player.getUUID(), 1, Integer::sum);
+            if (!state.has(StoryFlag.POST_CREDITS_SCENE_SEEN) && post == 481) {
+                StoryInteraction.open(player, "mira", "post_credits");
+            }
+            return;
+        }
         String quest = questId(state.activeQuest());
-        if (quest == null || state.has(StoryFlag.CHAPTER_1_COMPLETE)) return;
+        if (quest == null) return;
 
         int ticks = TICKS.merge(player.getUUID(), 1, Integer::sum);
         // Keep world checks cheap while retaining responsive objective progression; physical quest points are handled by block interaction callbacks.
