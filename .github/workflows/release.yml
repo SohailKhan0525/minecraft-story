@@ -27,6 +27,9 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "24"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.6.0"
       - name: Install open-source voice/audio tools
         run: |
           sudo apt-get update
