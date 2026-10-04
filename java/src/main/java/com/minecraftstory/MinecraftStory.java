@@ -5,6 +5,7 @@ import com.minecraftstory.story.Chapter1Story;
 import com.minecraftstory.story.StoryCommands;
 import com.minecraftstory.story.StoryNetwork;
 import com.minecraftstory.world.StoryWorld;
+import com.minecraftstory.client.StorySounds;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
@@ -26,11 +27,9 @@ public final class MinecraftStory implements ModInitializer {
         StoryItems.register();
         StoryNetwork.register();
         StoryWorld.register();
+        StorySounds.register();
 
-        // Developer-only tools remain available for testing; normal gameplay never requires them.
         StoryCommands.register();
-        // Chapter 1 runtime continues to expand through ordinary in-world interaction.\n        // CI verification marker: generated character skin resources are packaged by Gradle.
-        // CI verification marker: physical Find Elias encounter is part of the playable path.
     }
 
     public static Identifier id(String path) {
