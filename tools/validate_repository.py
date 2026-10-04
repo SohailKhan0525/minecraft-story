@@ -74,6 +74,15 @@ def main() -> int:
 
     if as_version(bp["header"]["version"]) != version or as_version(rp["header"]["version"]) != version:
         raise SystemExit("Java and Bedrock project versions are not aligned.")
+
+    for manifest_name, manifest in [("behavior", bp), ("resource", rp)]:
+        header_version = as_version(manifest["header"]["version"])
+        for module in manifest.get("modules", []):
+            if as_version(module["version"]) != header_version:
+                raise SystemExit(f"{manifest_name} pack module version drift detected.")
+        for dependency in manifest.get("dependencies", []):
+            if as_version(dependency["version"]) != header_version:
+                raise SystemExit(f"{manifest_name} pack dependency version drift detected.")
     if not any(d["uuid"] == rp["header"]["uuid"] for d in bp.get("dependencies", [])):
         raise SystemExit("Behavior pack does not depend on the canonical voice resource pack.")
     if "VERSION:" in (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8"):
