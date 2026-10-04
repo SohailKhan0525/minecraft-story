@@ -344,12 +344,19 @@ function advanceStory(p){
     tell(p,"The Hollow Knight's memory stands before the crystal. Do not attack it.");
     const memory=p.dimension.spawnEntity("minecraft:armor_stand",{x:p.location.x,y:p.location.y,z:p.location.z+5});
     memory.nameTag="Memory of the Hollow Knight";
-    memory.addTag(WAVE_TAG);
-  } else if(s===14&&!waveAlive(p.dimension)){
+    memory.addTag(MEMORY_TAG);
+    system.runTimeout(()=>{
+      if(stage(p)!==14)return;
+      setStage(p,15);
+      p.setDynamicProperty(MEMORY_READY,true);
+      title(p,"THE HEART","Touch the crying crystal.");
+      tell(p,"The memory fades without a fight. Touch the crying crystal at the center.");
+    },100);
+  } else if(s===14&&!waveAlive(p)){
     setStage(p,15);
     p.setDynamicProperty(MEMORY_READY,true);
     title(p,"THE HEART","Touch the crying crystal.");
-    tell(p,"The memory cannot be defeated. Touch the crying crystal at the center.");
+    tell(p,"Touch the crying crystal at the center.");
   } else if(s===15&&near(p,45,56,20,8)){
     tell(p,"Touch the crying crystal to make your final choice.");
   } else if(s===16){
@@ -365,8 +372,7 @@ world.afterEvents.playerSpawn.subscribe(e=>{
       setStage(p,0);
       p.setDynamicProperty(VOICE_LAST,"");
       setCheckpoint(p,0);
-      p.teleport({x:-12.5,y:65,z:35.5});
-      title(p,"CHAPTER 1","The Night the Sky Broke");
+      p.teleport({x:13.5,y:65,z:5.5});
       voice(p,"cold_open");
       title(p,"CHAPTER 1","THE NIGHT THE SKY BROKE");
       tell(p,"Start at Havenfall. Mara Vale is waiting ahead.");
