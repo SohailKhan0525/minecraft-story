@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Minecraft Story — Chapter 1 Voice Pack",
-    "description": "Generated original synthetic voice performances for Chapter 1.",
+    "name": "Minecraft Story — Voice Pack",
+    "description": "Generated original synthetic voice performances using the canonical cross-chapter voice profiles.",
     "uuid": "d4c4b82a-fb7d-49df-a2b8-7a02fc6b6a3d",
     "version": [
-      0,
       1,
-      1
+      0,
+      0
     ],
     "min_engine_version": [
       1,
@@ -17,7 +17,7 @@
   },
   "modules": [
     {
-      "description": "Minecraft Story Chapter 1 voice resources",
+      "description": "Minecraft Story cross-chapter voice resources",
       "type": "resources",
       "uuid": "3b3f9e1b-4d66-4ce2-bb73-b7cc56fc4f02",
       "version": [
