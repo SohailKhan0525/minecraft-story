@@ -27,6 +27,7 @@ public final class StorySounds {
     public static final SoundEvent VOICE_HEART = register("voice.heart");
     public static final SoundEvent VOICE_ENDING = register("voice.ending");
     public static final SoundEvent VOICE_POST_CREDITS = register("voice.post_credits");
+    public static final SoundEvent VOICE_CHAPTER2_OPENING = register("voice.chapter2_opening");
 
     private static final Map<String, SoundEvent> BY_SCENE = Map.ofEntries(
             Map.entry("cold_open", VOICE_COLD_OPEN),
@@ -39,7 +40,8 @@ public final class StorySounds {
             Map.entry("door_below", VOICE_DOOR_BELOW),
             Map.entry("heart", VOICE_HEART),
             Map.entry("ending", VOICE_ENDING),
-            Map.entry("post_credits", VOICE_POST_CREDITS)
+            Map.entry("post_credits", VOICE_POST_CREDITS),
+            Map.entry("chapter2_opening", VOICE_CHAPTER2_OPENING)
     );
 
     public static void register() {
