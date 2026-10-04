@@ -274,13 +274,6 @@ public final class StoryQuestSystem {
             spawnMemoryBoss(level, p, d);
             playerHint(p, "The Hollow Knight stops moving. Do not attack the memory. Touch the crystal when it opens.");
         }
-        if (progress >= 3 && progress < 4 && KNIGHT_MEMORY_SPAWNED.getOrDefault(p.getUUID(), false)
-                && noTaggedMobs(level, p, "minecraftstory_hollow_knight")) {
-            KNIGHT_MEMORY_SPAWNED.remove(p.getUUID());
-            KNIGHT_SPAWNED.remove(p.getUUID());
-            advance(p, s, 4, "The memory breaks. The Heart Chamber opens.");
-            complete(p, s, "The Heart of the Observatory");
-        }
     }
 
     private static void progressHeart(ServerPlayer p, StoryState s, ServerLevel level, int progress) {
