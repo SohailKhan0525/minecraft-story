@@ -46,7 +46,7 @@ jobs:
           BUMP_INPUT: ${{ github.event.inputs.bump || 'auto' }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message || '' }}
         run: |
-          gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" > releases.json
+          gh release list --limit 100 --json tagName,isDraft,isPrerelease > releases.json
           python - <<'PY'
           import json, os, re, subprocess
           from pathlib import Path
@@ -55,9 +55,9 @@ jobs:
           releases = json.loads(Path('releases.json').read_text(encoding='utf-8'))
           stable = []
           for release in releases:
-              if release.get('draft') or release.get('prerelease'):
+              if release.get('isDraft') or release.get('isPrerelease'):
                   continue
-              m = semver.fullmatch(release.get('tag_name', ''))
+              m = semver.fullmatch(release.get('tagName', ''))
               if m:
                   stable.append(tuple(map(int, m.groups())))
 
