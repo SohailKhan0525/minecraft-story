@@ -19,6 +19,7 @@ public final class StoryQuestSystem {
     private static final Map<UUID, Boolean> KNIGHT_SPAWNED = new ConcurrentHashMap<>();
     private static final Map<UUID, Boolean> HEART_WAVES_SPAWNED = new ConcurrentHashMap<>();
     private static final Map<UUID, Boolean> KNIGHT_FRACTURE_SPAWNED = new ConcurrentHashMap<>();
+    private static final Map<UUID, Boolean> KNIGHT_MEMORY_SPAWNED = new ConcurrentHashMap<>();
 
     private StoryQuestSystem() {}
 
@@ -198,14 +199,23 @@ public final class StoryQuestSystem {
         }
         if (progress >= 2 && progress < 3 && in(p, 36, 3, 52, 20) && noTaggedMobs(level, p, "minecraftstory_hollow_knight")) {
             KNIGHT_FRACTURE_SPAWNED.put(p.getUUID(), true);
-            spawnGuardians(level, p, Math.max(2, d.combatCount()));
+            spawnGuardians(level, p, Math.max(2, d.combatCount() + 1));
             advance(p, s, 3, "The Hollow Knight fractures into echoes.");
         }
-        if (progress >= 3 && in(p, 36, 3, 52, 20) && KNIGHT_FRACTURE_SPAWNED.getOrDefault(p.getUUID(), false)
-                && noTaggedMobs(level, p, "minecraftstory_hollow_knight")) {
+        if (progress >= 3 && progress < 4 && in(p, 36, 3, 52, 20)
+                && KNIGHT_FRACTURE_SPAWNED.getOrDefault(p.getUUID(), false)
+                && noTaggedMobs(level, p, "minecraftstory_hollow_knight")
+                && !KNIGHT_MEMORY_SPAWNED.getOrDefault(p.getUUID(), false)) {
             KNIGHT_FRACTURE_SPAWNED.remove(p.getUUID());
+            KNIGHT_MEMORY_SPAWNED.put(p.getUUID(), true);
+            spawnMemoryBoss(level, p, d);
+            playerHint(p, "The Hollow Knight stops moving. Do not attack the memory. Touch the crystal when it opens.");
+        }
+        if (progress >= 3 && progress < 4 && KNIGHT_MEMORY_SPAWNED.getOrDefault(p.getUUID(), false)
+                && noTaggedMobs(level, p, "minecraftstory_hollow_knight")) {
+            KNIGHT_MEMORY_SPAWNED.remove(p.getUUID());
             KNIGHT_SPAWNED.remove(p.getUUID());
-            advance(p, s, 4, "The final echo collapses.");
+            advance(p, s, 4, "The memory breaks. The Heart Chamber opens.");
             complete(p, s, "The Heart of the Observatory");
         }
     }
@@ -216,6 +226,7 @@ public final class StoryQuestSystem {
         if (progress == 1 && !HEART_WAVES_SPAWNED.getOrDefault(p.getUUID(), false)) {
             HEART_WAVES_SPAWNED.put(p.getUUID(), true);
             spawnWave(level, p, d.combatCount() + 2, "minecraftstory_heart_wave");
+            spawnWardenBoss(level, p, d);
         } else if (progress == 1 && HEART_WAVES_SPAWNED.getOrDefault(p.getUUID(), false)
                 && noTaggedMobs(level, p, "minecraftstory_heart_wave")) {
             HEART_WAVES_SPAWNED.remove(p.getUUID());
@@ -223,6 +234,7 @@ public final class StoryQuestSystem {
         } else if (progress == 2 && !HEART_WAVES_SPAWNED.getOrDefault(p.getUUID(), false)) {
             HEART_WAVES_SPAWNED.put(p.getUUID(), true);
             spawnWave(level, p, d.combatCount() + 1, "minecraftstory_heart_wave");
+            spawnWardenBoss(level, p, d);
         } else if (progress == 2 && HEART_WAVES_SPAWNED.getOrDefault(p.getUUID(), false)
                 && noTaggedMobs(level, p, "minecraftstory_heart_wave")) {
             HEART_WAVES_SPAWNED.remove(p.getUUID());
@@ -263,6 +275,48 @@ public final class StoryQuestSystem {
             }
             level.addFreshEntity(entity);
         }
+    }
+
+    private static void spawnMemoryBoss(ServerLevel level, ServerPlayer player, DifficultyProfile difficulty) {
+        var spawned = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "ravager"))
+                .create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        if (!(spawned instanceof LivingEntity entity)) return;
+        entity.setPos(player.getX(), player.getY(), player.getZ() + 7);
+        entity.setCustomName(Component.literal("Memory of the Hollow Knight"));
+        entity.setCustomNameVisible(true);
+        if (entity instanceof Mob mob) {
+            mob.setPersistenceRequired();
+            mob.setTarget(player);
+            var attack = mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+            var health = mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+            if (attack != null) attack.setBaseValue(22.0D);
+            if (health != null) health.setBaseValue(160.0D + difficulty.combatCount() * 45.0D);
+            mob.setHealth((float) (160.0D + difficulty.combatCount() * 45.0D));
+        }
+        entity.addTag("minecraftstory_hollow_knight");
+        level.addFreshEntity(entity);
+    }
+
+    private static void spawnWardenBoss(ServerLevel level, ServerPlayer player, DifficultyProfile difficulty) {
+        var spawned = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.fromNamespaceAndPath("minecraft", "warden"))
+                .create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        if (!(spawned instanceof LivingEntity entity)) return;
+        entity.setPos(player.getX(), player.getY(), player.getZ() + 8);
+        entity.setCustomName(Component.literal("Deep Warden Spawn"));
+        entity.setCustomNameVisible(true);
+        if (entity instanceof Mob mob) {
+            mob.setPersistenceRequired();
+            mob.setTarget(player);
+            var health = mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+            if (health != null) health.setBaseValue(300.0D + difficulty.combatCount() * 75.0D);
+            mob.setHealth((float) (300.0D + difficulty.combatCount() * 75.0D));
+        }
+        entity.addTag("minecraftstory_heart_wave");
+        level.addFreshEntity(entity);
+    }
+
+    private static void playerHint(ServerPlayer player, String text) {
+        player.sendSystemMessage(Component.literal(text), true);
     }
 
     private static void spawnWave(ServerLevel level, ServerPlayer player, int count, String tag) {
