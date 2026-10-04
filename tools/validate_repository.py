@@ -81,7 +81,8 @@ def main() -> int:
             if as_version(module["version"]) != header_version:
                 raise SystemExit(f"{manifest_name} pack module version drift detected.")
         for dependency in manifest.get("dependencies", []):
-            if as_version(dependency["version"]) != header_version:
+            # Native Script API dependencies use their own API versions.
+            if "uuid" in dependency and as_version(dependency["version"]) != header_version:
                 raise SystemExit(f"{manifest_name} pack dependency version drift detected.")
     if not any(d["uuid"] == rp["header"]["uuid"] for d in bp.get("dependencies", [])):
         raise SystemExit("Behavior pack does not depend on the canonical voice resource pack.")
