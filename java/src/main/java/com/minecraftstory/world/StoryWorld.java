@@ -4,6 +4,7 @@ import com.minecraftstory.story.StoryInteraction;
 import com.minecraftstory.story.StoryQuestSystem;
 import com.minecraftstory.story.StorySessionManager;
 import com.minecraftstory.story.StoryFlag;
+import com.minecraftstory.story.StoryNetwork;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -73,6 +74,7 @@ public final class StoryWorld {
             spawnNpcs(level);
 
             var state = StorySessionManager.state(player);
+            StoryNetwork.syncQuest(player, state);
             if (!state.has(StoryFlag.PLAYER_PLACED)) {
                 player.setPos(-12.5D, 65.0D, 35.5D);
                 player.setYRot(180.0F);
