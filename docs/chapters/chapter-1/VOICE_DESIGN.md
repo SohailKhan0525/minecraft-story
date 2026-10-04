@@ -4,120 +4,67 @@
 
 Every important character has a recognizable speaking identity.
 
-The goal is not simply to make every NPC speak. The goal is to make the player recognize who is speaking even before seeing the name.
+The shipped Chapter 1 voice layer uses synthetic original performances so players can actually hear the dialogue while the story runs. It is not a recording or imitation of a recognizable human actor.
 
 ## Main voices
 
 ### The Wanderer
-Player-controlled voice is optional for the player's spoken lines. In the initial implementation, the player can remain mostly silent while choices appear as authored dialogue. This preserves player identity and keeps voice production manageable.
+Grounded, uncertain, restrained. The player remains the viewpoint character, so the performance is intentionally understated.
 
 ### Mara Vale
-Low, controlled, tired authority. Short sentences. Rarely jokes. When she does, the joke lands because she almost never makes one.
+Low, controlled, tired authority. Short sentences. Rarely jokes.
 
 ### Elias Venn
-Fast, curious, slightly breathless. Talks when nervous. Uses humor as a defense mechanism.
+Fast, curious, slightly breathless. Humor appears when he is nervous.
 
 ### Brother Cael
-Soft, measured, deliberate. Long pauses. Sounds like someone carrying a secret.
+Soft, measured and deliberate. Pauses feel intentional.
 
 ### Sera Voss
-Dry, blunt, skeptical. Her humor is deadpan.
+Dry, blunt and skeptical. Deadpan timing is important.
 
 ### Hollow Knight
-Very sparse. Deep, restrained, unnatural resonance. Never speaks more than necessary.
+Sparse, low and unnatural. Never speaks more than necessary.
 
 ### The Warden of the Deep
-Not a conversational villain. Its voice is layered with stone, distant choir, and mechanical resonance. Most communication is short command-like phrases.
+Slow, command-like and heavy, with an intentionally synthetic edge.
 
-## Voice implementation
+### Mira
+Warm, playful and teasing. The post-credit scene should feel lighter than the main horror arc.
 
-The repository will store voice direction as metadata with each major line:
+## Audio architecture
 
-- speaker
-- emotion
-- intensity
-- pacing
-- pause markers
-- scene context
-- whether the line is foreground dialogue or ambient dialogue
+The canonical dialogue remains in Chapter1Content.java.
 
-Actual voice assets must be original or properly licensed. AI voice generation may be used only with appropriate rights and consent for any recognizable human voice.
+tools/generate_story_audio.py:
+
+1. reads the canonical scenes;
+2. selects a speaker profile;
+3. synthesizes each line;
+4. adds short pauses;
+5. joins the scene into one performance;
+6. exports mono OGG Vorbis;
+7. writes the same performance into Java and Bedrock resource locations.
+
+This keeps dialogue and voice assets synchronized.
 
 ## Realtime conversation
 
-The conversation system should support:
+The runtime is designed to support:
 
-- player choices during dialogue
-- NPC interruption
-- NPC-to-NPC conversations
-- contextual barks
-- reactions to player actions
-- proximity-triggered lines
-- combat barks
-- environmental comments
-- companion comments
-- conditional lines based on story flags
+- player choices during dialogue;
+- NPC interruption;
+- NPC-to-NPC conversations;
+- contextual barks;
+- reactions to player actions;
+- proximity-triggered lines;
+- combat barks;
+- environmental comments;
+- companion comments;
+- conditional lines based on story flags.
 
-## Background conversations
+The shipped Chapter 1 voice layer prioritizes authored main scenes. Ambient NPC barks remain a separate expansion area.
 
-Background NPCs should not feel like quest terminals.
+## Human cast replacement
 
-Examples:
-
-Farmer:
-"That is the third chicken."
-
-Fisher:
-"Third?"
-
-Farmer:
-"The same chicken."
-
-Fisher:
-"You've been counting?"
-
-Farmer:
-"I've been losing."
-
----
-
-Guard:
-"Did you hear that?"
-
-Guard 2:
-"No."
-
-Guard:
-"Exactly."
-
----
-
-Villager:
-"I heard the chapel bell."
-
-Shopkeeper:
-"The chapel bell hasn't rung in twelve years."
-
-Villager:
-"...Then what did I hear?"
-
-These conversations can trigger while the player walks past and should never pause gameplay.
-
-## Dynamic reactions
-
-NPCs can react to:
-
-- time of day
-- weather
-- nearby combat
-- blue fire
-- player reputation
-- chapter progress
-- whether Elias is missing
-- which first-choice path was selected
-- whether Sera was rescued
-- final crystal choice
-
-## Performance rule
-
-Ambient dialogue should be short. Most background exchanges should last 4–12 seconds. Important conversations can be longer and interruptible.
+Actual human recordings can replace the synthetic files while keeping the same resource filenames and scene IDs. Any future actor recordings must be original or properly licensed.
