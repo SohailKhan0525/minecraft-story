@@ -64,9 +64,21 @@ public final class StoryWorld {
                 if (!level.players().isEmpty()) {
                     ensureWorld(level);
                     spawnNpcs(level);
+                    triggerProximityScenes(level);
                 }
             }
         });
+    }
+
+    private static void triggerProximityScenes(ServerLevel level) {
+        Villager mara = level.getEntitiesOfClass(Villager.class,
+                new AABB(17, 63, -3, 23, 68, 3)).stream()
+                .filter(v -> v.getTags().contains("minecraftstory_npc:mara"))
+                .findFirst().orElse(null);
+        if (mara == null) return;
+        for (ServerPlayer player : level.players()) {
+            if (player.distanceToSqr(mara) <= 25.0D) StoryInteraction.openIntroduction(player);
+        }
     }
 
     private static void ensureWorld(ServerLevel level) {
