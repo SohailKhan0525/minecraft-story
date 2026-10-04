@@ -104,7 +104,7 @@ public final class StoryWorld {
             for (ServerLevel level : server.getAllLevels()) {
                 if (!level.players().isEmpty()) {
                     ensureWorld(level);
-                    spawnNpcs(level);
+                    if (level.getGameTime() % 100L == 0L) spawnNpcs(level);
                     triggerProximityScenes(level);
                     for (ServerPlayer player : level.players()) StoryQuestSystem.tick(player);
                     StoryAmbientSystem.tick(level);
