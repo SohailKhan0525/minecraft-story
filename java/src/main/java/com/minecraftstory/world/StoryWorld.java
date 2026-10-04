@@ -166,6 +166,8 @@ public final class StoryWorld {
         // Underground Observatory floor and chamber.
         buildObservatory(level, 38, oy - 10, -10);
         buildObservatoryRings(level, 42, oy - 10, -4);
+        makeMarker(level, 38, oy - 10, -10, Blocks.MAP_TABLE.defaultBlockState());
+        makeMarker(level, 42, oy - 9, 6, Blocks.IRON_BARS.defaultBlockState());
 
         // Deep chamber with a visible black-crystal focus.
         buildHeartChamber(level, 45, oy - 10, 20);
