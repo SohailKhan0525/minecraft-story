@@ -97,6 +97,12 @@ tasks.configureEach {
 tasks.withType(JavaCompile).configureEach {
     it.options.release = 25
 }
+tasks.withType(ProcessResources).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 java {
     withSourcesJar()
     sourceCompatibility = JavaVersion.VERSION_25
