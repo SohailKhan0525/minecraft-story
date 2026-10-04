@@ -27,7 +27,7 @@ The chapter ends at:
 
 ## Voices
 
-Chapter voices are generated from one canonical audio/voice_profiles.json table with open-source eSpeak/FFmpeg tooling. The same character profile is reused in Chapter 1 and Chapter 2, and release builds contain the generated audio.
+Chapter voices are generated from one canonical audio/voice_profiles.json table with open-source eSpeak/FFmpeg tooling. The exact same canonical character profile is reused in Chapter 1 and Chapter 2, and release builds contain the generated audio.
 
 ## Platform model
 
