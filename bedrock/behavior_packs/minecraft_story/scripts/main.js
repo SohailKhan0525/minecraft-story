@@ -129,7 +129,7 @@ function patchWorldV3(d){
   d.runCommand("fill 49 55 -10 49 57 20 obsidian");
   d.runCommand("fill 34 58 -11 49 58 20 obsidian");
   d.runCommand("fill 35 55 -9 48 57 19 air");
-  for(let i=0;i<12;i++){
+  for(let i=0;i<20;i++){
     const y=63-Math.floor(i/2), z=-18+i;
     d.runCommand("setblock 38 "+y+" "+z+" polished_deepslate_stairs");
     d.runCommand("setblock 37 "+y+" "+z+" cobbled_deepslate");
@@ -368,7 +368,8 @@ world.afterEvents.playerSpawn.subscribe(e=>{
       p.teleport({x:-12.5,y:65,z:35.5});
       title(p,"CHAPTER 1","The Night the Sky Broke");
       voice(p,"cold_open");
-      title(p,"THE NIGHT THE SKY BROKE","CHAPTER 1 • Follow the river toward Havenfall.");
+      title(p,"CHAPTER 1","THE NIGHT THE SKY BROKE");
+      tell(p,"Start at Havenfall. Mara Vale is waiting ahead.");
       tell(p,"The forest has gone silent.");
     } else {
       title(p,"CHAPTER 1","Continue your story.");
