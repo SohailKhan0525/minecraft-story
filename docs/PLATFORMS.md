@@ -1,38 +1,74 @@
-# Platform Strategy
+# Platform Support
 
-## Release model
+## Goal
 
-The project has one narrative specification and separate platform runtimes.
+The project has one canonical Chapter 1 story specification and separate implementations for Minecraft Java Edition and Bedrock Edition.
 
-| Platform | Runtime | Status |
-|---|---|---|
-| Windows/Linux/macOS | Minecraft Java 26.3 + Fabric | **Active Chapter 1 implementation** |
-| Android | Minecraft Bedrock add-on | **Bedrock vertical slice added; parity in progress** |
-| iPhone/iPad | Minecraft Bedrock add-on | **Bedrock vertical slice added; parity in progress** |
-| Xbox/PlayStation/Switch | Minecraft Bedrock add-on via supported world/Realm workflows | **Bedrock vertical slice; parity in progress** |
+| Device / edition | Distribution | Chapter 1 | Voice audio |
+|---|---|---|---|
+| Windows Java | Fabric mod JAR | Implemented target | Generated scene performances |
+| Linux Java | Fabric mod JAR | Implemented target | Generated scene performances |
+| macOS Java | Fabric mod JAR | Implemented target | Generated scene performances |
+| Windows Bedrock | Add-on (.mcaddon) | Implemented runtime target | Resource-pack scene performances |
+| Android Bedrock | Add-on (.mcaddon) | Implemented runtime target | Resource-pack scene performances |
+| iPhone/iPad Bedrock | Add-on (.mcaddon) | Implemented runtime target | Resource-pack scene performances |
+| Xbox / PlayStation / Switch | Bedrock add-on/world/Realm workflow | Platform-specific validation required | Resource-pack audio is part of the design |
 
-## Why there cannot be one file for every device
+## Why there are separate files
 
-Java mods and Bedrock add-ons are different technologies. A Fabric JAR cannot be installed into Bedrock, and a Bedrock MCPACK cannot be installed into Java.
+Java mods and Bedrock add-ons are different systems. A Fabric JAR cannot be dropped into Bedrock, and a Bedrock add-on cannot be installed as a Java mod.
 
-Therefore the project keeps one story, one quest/choice specification, one character/dialogue specification, and separate Java and Bedrock implementations.
+The project shares:
 
-## Bedrock portability
+- story canon
+- characters
+- dialogue
+- choices
+- quest names
+- persistent story flags
+- chapter order
+- audio source text
 
-Microsoft's official Bedrock Add-On documentation covers installation on Windows, Android, iOS and supported console/Realm workflows. Bedrock scripting can control entities, blocks and custom gameplay, so Chapter 1 can be ported rather than reduced to a text-only story.
+but uses platform-specific runtime code.
 
-Priorities for the Bedrock port:
-1. Chapter 1 world layout.
-2. Story flags and save state.
-3. NPC dialogue and choices.
-4. Quest objectives.
-5. Combat encounters.
-6. Final crystal choices.
-7. Credits/post-credits sequence.
-8. Mira epilogue.
-9. Chapter 2 coming-soon screen.
-10. Resource-pack models/textures and mobile-friendly UI.
+## Voice distribution
 
-## Current truth
+tools/generate_story_audio.py reads the canonical Java dialogue file and renders mono OGG Vorbis scene performances.
 
-> Java/Fabric has the full Chapter 1 implementation. Bedrock now has a real scripted vertical slice with touch/controller-friendly dialogue and the Chapter 1 ending flow; full Chapter 1 parity is still in progress.
+Java output:
+
+java/src/main/resources/assets/minecraftstory/sounds/voice/
+
+Bedrock output:
+
+bedrock/resource_packs/minecraft_story/sounds/minecraftstory/voice/
+
+The audio is synthetic original speech, not a cloned or recognizable actor voice. A future human-recorded cast can replace the files without changing the story runtime.
+
+## Build artifacts
+
+The GitHub Actions Audio and playable builds workflow:
+
+1. generates Chapter 1 voice audio;
+2. packages the Java mod;
+3. packages the Bedrock .mcaddon;
+4. publishes downloadable workflow artifacts;
+5. commits generated voice resources to main.
+
+The workflow does not create development branches.
+
+## Current support truth
+
+Java 26.3 + Fabric is the primary implementation.
+
+Bedrock includes:
+
+- scripted Chapter 1 progression;
+- dialogue choices;
+- generated voice playback;
+- resource-pack sound definitions;
+- the Heart interaction gate;
+- credits and Mira epilogue;
+- a Chapter 2 coming-soon endpoint.
+
+Console-specific import/distribution rules still need real-device validation and cannot be honestly certified from source review alone.
