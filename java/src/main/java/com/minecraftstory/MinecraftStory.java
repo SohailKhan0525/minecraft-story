@@ -5,7 +5,6 @@ import com.minecraftstory.story.Chapter1Story;
 import com.minecraftstory.story.StoryCommands;
 import com.minecraftstory.story.StoryNetwork;
 import com.minecraftstory.world.StoryWorld;
-import com.minecraftstory.client.StorySounds;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
