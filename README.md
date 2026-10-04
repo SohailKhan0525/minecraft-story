@@ -14,41 +14,39 @@ Build an episodic Minecraft adventure that combines:
 - dungeons and puzzles
 - cinematic moments
 - persistent story progression
+- spoken story audio
 
-The long-term goal is to support both **Minecraft: Java Edition** and **Minecraft: Bedrock Edition** through platform-specific implementations that share the same story, lore, design, and content specifications.
-
-## Development approach
-
-We build one chapter at a time.
-
-1. Foundation and core systems
-2. Chapter 1 prototype
-3. Chapter 1 production
-4. Playtesting and polish
-5. Chapter 1 release
-6. Chapter 2 and beyond
-
-## Platforms
-
-- Java Edition: primary development target initially
-- Bedrock Edition: planned companion implementation for PC/mobile/console
-- Shared design documents keep the two implementations aligned
+The long-term goal is to support both Minecraft: Java Edition and Minecraft: Bedrock Edition through platform-specific implementations that share the same story, lore, design, and content specifications.
 
 ## Current status
 
-**Pre-production / repository bootstrap**
+**Chapter 1 implementation in active development.**
 
-Minecraft Java Edition **26.3** is the initial Java target. Fabric is the initial Java modding toolchain.
+Chapter 1: **The Night the Sky Broke**
+
+The Java runtime is the primary implementation. The Bedrock runtime contains a separate playable implementation with touch/controller-friendly story UI and generated voice playback.
+
+The project now includes:
+
+- persistent Chapter 1 quest and story state;
+- physical world objectives and combat encounters on Java;
+- Bedrock scripted Chapter 1 progression;
+- generated synthetic voice performances for the main Chapter 1 scenes;
+- Java SoundEvent playback and narrator fallback;
+- Bedrock resource-pack sound definitions and player-local voice playback;
+- Chapter 1 ending, credits and Mira post-credit epilogue;
+- Chapter 2 preserved as a coming-soon endpoint.
+
+## Build / play
+
+See docs/PLAYING.md for a clean-machine installation guide.
+
+See docs/AUDIO.md for the voice/audio pipeline.
 
 See:
-- `docs/ROADMAP.md`
-- `docs/ARCHITECTURE.md`
-- `docs/PLATFORMS.md`
-- `docs/chapters/chapter-1/README.md`
+- docs/ROADMAP.md
+- docs/ARCHITECTURE.md
+- docs/PLATFORMS.md
+- docs/chapters/chapter-1/README.md
 
 > This is an independent project and is not an official Minecraft product.
-
-
-## Playing the game
-
-See docs/PLAYING.md for installation and platform support.
