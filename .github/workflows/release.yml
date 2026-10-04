@@ -1,113 +1,279 @@
-name: Release Chapter 1
+name: Release
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      bump:
+        description: Semantic version bump
+        required: false
+        default: auto
+        type: choice
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+
+concurrency:
+  group: minecraft-story-release
+  cancel-in-progress: false
 
 permissions:
   contents: write
 
-env:
-  VERSION: "1.0.0"
-
 jobs:
-  build:
+  prepare:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]')
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      commit_sha: ${{ steps.version.outputs.commit_sha }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Detect latest published stable version and bump semver
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUMP_INPUT: ${{ github.event.inputs.bump || 'auto' }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message || '' }}
+        run: |
+          gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" > releases.json
+          python - <<'PY'
+          import json, os, re, subprocess
+          from pathlib import Path
+
+          semver = re.compile(r'^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$')
+          releases = json.loads(Path('releases.json').read_text(encoding='utf-8'))
+          stable = []
+          for release in releases:
+              if release.get('draft') or release.get('prerelease'):
+                  continue
+              m = semver.fullmatch(release.get('tag_name', ''))
+              if m:
+                  stable.append(tuple(map(int, m.groups())))
+
+          if stable:
+              base = max(stable)
+          else:
+              text = Path('java/gradle.properties').read_text(encoding='utf-8')
+              m = re.search(r'(?m)^version=(\d+\.\d+\.\d+)$', text)
+              base = tuple(map(int, m.group(1).split('.'))) if m else (0, 1, 0)
+
+          bump = os.environ['BUMP_INPUT']
+          msg = os.environ['COMMIT_MESSAGE'].lower()
+          if bump == 'auto':
+              if re.search(r'breaking change|(?:^|\s)(?:feat|fix|perf)!:', msg):
+                  bump = 'major'
+              elif re.search(r'^feat(?:\(|:)', msg):
+                  bump = 'minor'
+              else:
+                  bump = 'patch'
+
+          major, minor, patch = base
+          if bump == 'major':
+              next_version = (major + 1, 0, 0)
+          elif bump == 'minor':
+              next_version = (major, minor + 1, 0)
+          else:
+              next_version = (major, minor, patch + 1)
+
+          version = '.'.join(map(str, next_version))
+          tag = 'v' + version
+          check = subprocess.run(['gh', 'release', 'view', tag], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+          if check.returncode == 0:
+              raise SystemExit(f'Release {tag} already exists.')
+
+          major, minor, patch = next_version
+          gradle = Path('java/gradle.properties')
+          text = gradle.read_text(encoding='utf-8')
+          gradle.write_text(re.sub(r'(?m)^version=\d+\.\d+\.\d+$', f'version={version}', text), encoding='utf-8')
+
+          for filename in [
+              'bedrock/behavior_packs/minecraft_story/manifest.json',
+              'bedrock/resource_packs/minecraft_story/manifest.json',
+          ]:
+              p = Path(filename)
+              data = json.loads(p.read_text(encoding='utf-8'))
+              data['header']['version'] = [major, minor, patch]
+              for module in data.get('modules', []):
+                  module['version'] = [major, minor, patch]
+              for dependency in data.get('dependencies', []):
+                  dependency['version'] = [major, minor, patch]
+              p.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
+
+          subprocess.run(['git', 'config', 'user.name', 'github-actions[bot]'], check=True)
+          subprocess.run(['git', 'config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com'], check=True)
+          subprocess.run(['git', 'add',
+                          'java/gradle.properties',
+                          'bedrock/behavior_packs/minecraft_story/manifest.json',
+                          'bedrock/resource_packs/minecraft_story/manifest.json'], check=True)
+          subprocess.run(['git', 'commit', '-m', f'chore(release): {tag} [skip ci]'], check=True)
+          subprocess.run(['git', 'push', 'origin', 'HEAD:main'], check=True)
+          sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
+              out.write(f'version={version}\n')
+              out.write(f'commit_sha={sha}\n')
+          print(f'Prepared {tag} from latest published stable {base} using {bump} bump.')
+          PY
+
+  java:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    name: Java release check — ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.commit_sha }}
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: "25"
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.13"
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "24"
+          java-version: '25'
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "9.6.0"
-      - name: Install open-source voice/audio tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y espeak ffmpeg
-      - name: Validate Bedrock script syntax
-        run: node --check bedrock/behavior_packs/minecraft_story/scripts/main.js
-      - name: Validate Bedrock pack structure
-        run: python tools/validate_bedrock.py
-      - name: Generate Chapter 1 spoken audio
-        run: python tools/generate_story_audio.py
-      - name: Validate every generated voice file
-        run: python tools/validate_voice_assets.py
-      - name: Build Java release with voices included
+          gradle-version: '9.6.0'
+      - name: Build Java mod
         working-directory: java
         run: gradle build --stacktrace --warning-mode all
-      - name: Package Bedrock release with voices included
+
+  bedrock:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    name: Bedrock release check — ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.commit_sha }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Validate Bedrock script syntax
+        run: node --check bedrock/behavior_packs/minecraft_story/scripts/main.js
+      - name: Validate repository consistency
+        run: python tools/validate_repository.py
+      - name: Validate Bedrock pack structure
+        run: python tools/validate_bedrock.py
+
+  voice:
+    needs: prepare
+    runs-on: ubuntu-latest
+    name: Shared voice identity and asset check
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.commit_sha }}
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Install open-source TTS/audio tools
+        run: sudo apt-get update && sudo apt-get install -y espeak ffmpeg
+      - name: Generate all Chapter 1 and Chapter 2 voices
+        run: python tools/generate_story_audio.py
+      - name: Validate every generated voice asset
+        run: python tools/validate_voice_assets.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: voice-assets-${{ needs.prepare.outputs.version }}
+          path: |
+            java/src/main/resources/assets/minecraftstory/sounds/voice
+            bedrock/resource_packs/minecraft_story/sounds/minecraftstory/voice
+
+  package:
+    needs: [prepare, java, bedrock, voice]
+    runs-on: ubuntu-latest
+    name: Package verified Chapter 1 release
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.commit_sha }}
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.6.0'
+      - uses: actions/download-artifact@v5
+        with:
+          name: voice-assets-${{ needs.prepare.outputs.version }}
+          path: .
+      - name: Final repository audit
+        run: python tools/validate_repository.py
+      - name: Final generated voice validation
+        run: python tools/validate_voice_assets.py
+      - name: Build Java release with bundled voices
+        working-directory: java
+        run: gradle build --stacktrace --warning-mode all
+      - name: Package Bedrock release with bundled voices
         run: python tools/package_bedrock_addon.py
       - name: Prepare release assets
         run: |
           mkdir -p release
           JAVA_JAR=$(find java/build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' -print -quit)
           test -n "$JAVA_JAR"
-          cp "$JAVA_JAR" "release/minecraft-story-java-${{ env.VERSION }}.jar"
-          cp dist/minecraft-story-chapter-1.mcaddon "release/minecraft-story-bedrock-${{ env.VERSION }}.mcaddon"
+          cp "$JAVA_JAR" "release/minecraft-story-java-${{ needs.prepare.outputs.version }}.jar"
+          cp dist/minecraft-story-chapter-1.mcaddon "release/minecraft-story-bedrock-${{ needs.prepare.outputs.version }}.mcaddon"
       - uses: actions/upload-artifact@v4
         with:
-          name: chapter-1-release-${{ env.VERSION }}
+          name: release-assets-${{ needs.prepare.outputs.version }}
           path: release/*
 
   publish:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]')
-    needs: build
+    needs: [prepare, package]
     runs-on: ubuntu-latest
+    name: Publish GitHub release
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.commit_sha }}
       - uses: actions/download-artifact@v5
         with:
-          name: chapter-1-release-${{ env.VERSION }}
+          name: release-assets-${{ needs.prepare.outputs.version }}
           path: release
       - name: Publish semantic GitHub release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: v${{ env.VERSION }}
-          target_commitish: ${{ github.sha }}
-          name: Minecraft Story — Chapter 1 v${{ env.VERSION }}
+          tag_name: v${{ needs.prepare.outputs.version }}
+          target_commitish: ${{ needs.prepare.outputs.commit_sha }}
+          name: Minecraft Story — Chapter 1 v${{ needs.prepare.outputs.version }}
           generate_release_notes: true
           body: |
             # Minecraft Story — Chapter 1
 
-            The Night the Sky Broke
+            **The Night the Sky Broke**
 
-            ## Install
+            Download the Java `.jar` or Bedrock `.mcaddon`. Voices are bundled; no separate voice download is required.
 
-            Java Edition: download minecraft-story-java-${{ env.VERSION }}.jar, install Minecraft Java 26.3 + Fabric Loader 0.19.5 + Fabric API 0.161.0+26.3, place the JAR in .minecraft/mods, launch Fabric 26.3, and create a new world.
+            The release is published only after Java builds pass on Ubuntu, Windows and macOS; Bedrock validation passes on Ubuntu, Windows and macOS; and the shared cross-chapter voice assets pass generation and validation.
 
-            Bedrock Edition: download minecraft-story-bedrock-${{ env.VERSION }}.mcaddon, open it with Minecraft Bedrock, let it import, activate the Minecraft Story behavior pack and Chapter 1 Voice Pack resource pack, then create a new world.
+            Chapter 1 ends at **TO BE CONTINUED — CHAPTER 2 COMING SOON**.
 
-            ## Voice
-
-            Spoken Chapter 1 audio is already bundled in both release builds. There is no separate voice download.
-
-            ## Release contents
-
-            - Full Chapter 1 story flow
-            - Spoken Chapter 1 scene audio
-            - Java Fabric mod
-            - Bedrock add-on
-            - Ending, credits, and Mira post-credit scene
-            - Chapter 2 coming-soon endpoint
-
-            ## Compatibility
-
-            Java: Minecraft 26.3 + Fabric Loader 0.19.5 + Fabric API 0.161.0+26.3.
-
-            Bedrock: packaged Bedrock add-on. Windows, Android and iOS use the normal Minecraft add-on import flow. Console distribution uses the supported Bedrock/world/Realm workflow for that platform.
-
-            This project is independent Minecraft content and is not affiliated with Mojang or Microsoft.
-
+            This is independent Minecraft content and is not affiliated with Mojang or Microsoft.
           files: |
-            release/minecraft-story-java-${{ env.VERSION }}.jar
-            release/minecraft-story-bedrock-${{ env.VERSION }}.mcaddon
+            release/minecraft-story-java-${{ needs.prepare.outputs.version }}.jar
+            release/minecraft-story-bedrock-${{ needs.prepare.outputs.version }}.mcaddon
