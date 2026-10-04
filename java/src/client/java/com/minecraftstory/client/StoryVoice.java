@@ -13,8 +13,8 @@ public final class StoryVoice {
 
     public static void speak(String speaker, String text) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.options.accessibility().narrator().get().isEnabled()) {
-            minecraft.getNarrator().say(Component.literal(speaker + ": " + text));
+        if (minecraft.getNarrator().isActive()) {
+            minecraft.getNarrator().narrate(Component.literal(speaker + ": " + text));
         }
     }
 }
