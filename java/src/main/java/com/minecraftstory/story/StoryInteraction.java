@@ -27,9 +27,9 @@ public final class StoryInteraction {
         if (npcId.equals("crystal") && (!state.activeQuest().equals("The Heart of the Observatory") || state.questProgress() < 4)) return;
 
         switch (npcId + ":" + choiceId) {
-            case "mara:light_yes" -> { Chapter1Story.chooseIntroduction(state, "saw_the_light"); state.setActiveQuest("Blue Fire"); }
-            case "mara:light_no" -> { Chapter1Story.chooseIntroduction(state, "memory_missing"); state.setActiveQuest("Blue Fire"); }
-            case "mara:light_unsure" -> { Chapter1Story.chooseIntroduction(state, "deny_light"); state.setActiveQuest("Blue Fire"); }
+            case "mara:light_yes" -> { Chapter1Story.chooseIntroduction(state, "saw_the_light"); StoryQuestSystem.resolveChoice(player, "mara"); }
+            case "mara:light_no" -> { Chapter1Story.chooseIntroduction(state, "memory_missing"); StoryQuestSystem.resolveChoice(player, "mara"); }
+            case "mara:light_unsure" -> { Chapter1Story.chooseIntroduction(state, "deny_light"); StoryQuestSystem.resolveChoice(player, "mara"); }
             case "sera:mercy" -> { Chapter1Story.chooseObservatoryPath(state, true); StoryQuestSystem.resolveChoice(player, "sera"); }
             case "sera:knowledge" -> { Chapter1Story.chooseObservatoryPath(state, false); StoryQuestSystem.resolveChoice(player, "sera"); }
             case "crystal:seal" -> { Chapter1Story.chooseCrystalEnding(state, "seal"); StoryQuestSystem.resolveChoice(player, "crystal"); }
