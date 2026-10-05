@@ -8,6 +8,7 @@ const MEMORY_READY = "minecraftstory_memory_ready";
 const VOICE_LAST = "minecraftstory_last_voice";
 const WORLD_MARK = "minecraftstory_bedrock_world_built";
 const WORLD_VERSION = "minecraftstory_bedrock_world_version";
+const GUIDE_X=20, GUIDE_Y=65, GUIDE_Z=6;
 const MEMORY_TAG = "minecraftstory_memory";
 const VOICE_PREFIX = "minecraftstory:voice.";
 const STORY_TAG_PREFIX = "minecraftstory_npc:";
@@ -74,7 +75,7 @@ async function choice(p,titleText,body,buttons){
   return r.canceled?null:r.selection;
 }
 function storyEntities(d,tag){
-  return d.getEntities({type:"minecraft:villager",tags:[STORY_TAG_PREFIX+tag]});
+  return d.getEntities({tags:[STORY_TAG_PREFIX+tag]});
 }
 function ensureNpc(d,id,name,x,y,z){
   const tag=STORY_TAG_PREFIX+id;
@@ -93,6 +94,7 @@ function ensureNpc(d,id,name,x,y,z){
   try{ e.addEffect("glowing", 20000000, {showParticles:false}); }catch(_e){}
   return e;
 }
+function nearBlock(b,x,y,z,r=1){ return Math.abs(b.location.x-x)<=r && Math.abs(b.location.y-y)<=r && Math.abs(b.location.z-z)<=r; }
 function distanceSq(a,b){ return (a.x-b.x)**2+(a.y-b.y)**2+(a.z-b.z)**2; }
 function ensureNpcs(d){
   const completed=world.getPlayers().every(p=>stage(p)>=17);
@@ -104,6 +106,63 @@ function ensureNpcs(d){
     if(epiloguePlayers.length) ensureNpc(d,"mira","Mira",18,64,-4);
   }
 }
+function guideHint(p){
+  const s=stage(p), n=progress(p);
+  const hints={
+    0:"Find Mara Vale in Havenfall. Follow the lantern path from spawn.",
+    1:"Talk to Brother Cael, then inspect all 3 cold-blue flames in the chapel.",
+    2:"Inspect the first Elias clue at the mapmaking workshop.",
+    3:"Follow the second clue east: inspect the torn survey rope.",
+    4:"Inspect the dark stone clue deeper in the forest.",
+    5:"Inspect the blackstone trail marker.",
+    6:"Inspect the final cartography table, then speak to Elias.",
+    7:"Meet Sera at the Observatory edge and choose rescue or archive.",
+    8:"Recover the Ash Lens from the gold relic pedestal.",
+    9:"Recover the Star-Iron Shard from the iron relic pedestal.",
+    10:"Recover the Warden Seal from the crying-blackstone pedestal.",
+    11:"Use the three relics at the Observatory ring.",
+    12:"Open the marked gate beneath the Observatory.",
+    13:"Survive the Hollow Knight guardians.",
+    14:"Do not attack the memory. Wait for the Heart prompt.",
+    15:"Approach the crying crystal and interact with it.",
+    16:"Watch the ending, then wait for the post-credit scene.",
+    17:"Find Mira in Havenfall and finish the post-credit conversation.",
+    18:"CHAPTER 1 COMPLETE — Chapter 2 is coming soon."
+  };
+  const text=hints[s]||"Follow the current Chapter 1 objective.";
+  try{ p.onScreenDisplay.setActionBar("§6CHAPTER 1§r • §f"+text+" §8["+n+"]"); }catch(_e){}
+}
+async function guideForm(p){
+  const s=stage(p), n=progress(p);
+  const body=guideHintText(p);
+  const r=await choice(p,"STORY GUIDE","Chapter 1 • The Night the Sky Broke\n\n"+body+"\n\nHow to play: follow the lantern/gold route, talk to glowing NPCs, and interact with the marked story objects.",["Return to my checkpoint","Close"]);
+  if(r===0) respawnToCheckpoint(p);
+}
+function guideHintText(p){
+  const hints={
+    0:"NEXT: Find Mara Vale in Havenfall.",
+    1:"NEXT: Talk to Brother Cael, then inspect 3 cold-blue flames.",
+    2:"NEXT: Inspect the first Elias clue at the workshop.",
+    3:"NEXT: Inspect the torn survey rope.",
+    4:"NEXT: Inspect the dark stone clue.",
+    5:"NEXT: Inspect the blackstone trail marker.",
+    6:"NEXT: Inspect the final cartography table, then talk to Elias.",
+    7:"NEXT: Meet Sera and choose rescue or archive.",
+    8:"NEXT: Recover the Ash Lens.",
+    9:"NEXT: Recover the Star-Iron Shard.",
+    10:"NEXT: Recover the Warden Seal.",
+    11:"NEXT: Align the ring with all 3 relics.",
+    12:"NEXT: Open the marked gate.",
+    13:"NEXT: Survive the Hollow Knight guardians.",
+    14:"NEXT: Leave the memory alone.",
+    15:"NEXT: Interact with the crying crystal.",
+    16:"NEXT: Watch the ending.",
+    17:"NEXT: Meet Mira.",
+    18:"CHAPTER 1 COMPLETE."
+  };
+  return hints[stage(p)]||"NEXT: Follow the current objective.";
+}
+
 function blockText(d,text,x,y,z,block="gold_block"){
   const glyphs={
     "C":["1111","1000","1000","1000","1000","1000","1111"],
@@ -150,11 +209,75 @@ function patchWorldV3(d){
   d.runCommand("setblock -14 64 17 glowstone");
   world.setDynamicProperty(WORLD_VERSION,3);
 }
+function patchWorldV4(d){
+  // Structured town route and Story Guide bell.
+  d.runCommand("fill 12 64 4 22 64 6 dirt_path");
+  d.runCommand("fill 18 64 -2 20 64 6 dirt_path");
+  d.runCommand("fill 10 64 6 18 64 8 dirt_path");
+  d.runCommand("fill 20 64 6 25 64 11 dirt_path");
+  d.runCommand("setblock 20 64 6 cut_sandstone");
+  d.runCommand("setblock 20 65 6 bell");
+  d.runCommand("setblock 19 64 6 gold_block");
+  d.runCommand("setblock 21 64 6 gold_block");
+
+  // Real home entrances and lantern route.
+  d.runCommand("setblock 12 64 8 spruce_fence_gate");
+  d.runCommand("setblock 28 64 8 oak_fence_gate");
+  d.runCommand("setblock 4 64 -8 spruce_fence_gate");
+  for(const [x,y,z] of [[16,64,6],[18,64,2],[21,64,9],[28,64,5],[32,64,0],[35,64,-6],[35,64,-14],[39,64,-22]]){
+    d.runCommand("setblock "+x+" "+y+" "+z+" oak_fence");
+    d.runCommand("setblock "+x+" "+(y+1)+" "+z+" oak_fence");
+    d.runCommand("setblock "+x+" "+(y+2)+" "+z+" lantern");
+  }
+
+  // Forest gate and safe trail.
+  d.runCommand("fill 27 64 -4 29 68 -4 stone_bricks");
+  d.runCommand("setblock 28 67 -4 glowstone");
+  d.runCommand("fill 25 64 -4 28 64 -4 dirt_path");
+  d.runCommand("fill 28 64 -22 39 64 -22 dirt_path");
+
+  // Fix the underground route: stairs now meet a real Observatory entrance.
+  d.runCommand("fill 38 54 -3 40 58 -3 deepslate_bricks");
+  d.runCommand("setblock 39 54 -3 spruce_fence_gate");
+  d.runCommand("fill 39 63 -18 39 54 1 polished_deepslate");
+  for(let i=0;i<20;i++){
+    const y=63-Math.floor(i/2), z=-18+i;
+    d.runCommand("setblock 39 "+y+" "+z+" polished_deepslate_stairs");
+    d.runCommand("setblock 38 "+y+" "+z+" cobbled_deepslate");
+    d.runCommand("setblock 40 "+y+" "+z+" cobbled_deepslate");
+  }
+
+  // Real marked gate to the Heart route.
+  d.runCommand("fill 40 55 6 44 58 6 obsidian");
+  d.runCommand("setblock 42 55 6 spruce_fence_gate");
+  d.runCommand("fill 42 54 6 42 54 19 polished_deepslate");
+  d.runCommand("fill 42 54 19 45 54 19 polished_deepslate");
+
+  // Enclosed Heart Chamber.
+  d.runCommand("fill 39 54 14 51 59 26 obsidian");
+  d.runCommand("fill 40 55 15 50 58 25 air");
+  d.runCommand("setblock 45 55 14 spruce_fence_gate");
+  d.runCommand("setblock 45 56 20 crying_obsidian");
+  d.runCommand("setblock 45 57 20 amethyst_block");
+  d.runCommand("setblock 45 58 20 glowstone");
+
+  // Visible checkpoint beacons.
+  for(const [x,y,z] of [[-12,64,35],[8,64,8],[25,64,11],[39,64,-22],[42,55,2],[42,55,6],[45,55,15],[18,64,0]]){
+    d.runCommand("setblock "+x+" "+y+" "+z+" gold_block");
+    d.runCommand("setblock "+x+" "+(y+1)+" "+z+" amethyst_block");
+    d.runCommand("setblock "+x+" "+(y+2)+" "+z+" glowstone");
+  }
+
+  d.runCommand("fill -14 64 18 14 64 20 stone_bricks");
+  blockText(d,"CHAPTER 1",-13,65,18,"gold_block");
+  world.setDynamicProperty(WORLD_VERSION,4);
+}
+
 function build(d){
   const version=Number(world.getDynamicProperty(WORLD_VERSION)??0);
-  if(world.getDynamicProperty(WORLD_MARK) && version>=3)return;
-  if(world.getDynamicProperty(WORLD_MARK) && version<3){
-    patchWorldV3(d);
+  if(world.getDynamicProperty(WORLD_MARK) && version>=4)return;
+  if(world.getDynamicProperty(WORLD_MARK) && version<4){
+    patchWorldV4(d);
     return;
   }
   d.runCommand("fill -60 63 -50 60 63 38 grass_block");
@@ -171,7 +294,7 @@ function build(d){
   d.runCommand("fill 49 55 -10 49 57 20 obsidian");
   d.runCommand("fill 34 58 -11 49 58 20 obsidian");
   d.runCommand("fill 35 55 -9 48 57 19 air");
-  for(let i=0;i<12;i++){
+  for(let i=0;i<20;i++){
     const y=63-Math.floor(i/2);
     const z=-18+i;
     d.runCommand("setblock 38 "+y+" "+z+" polished_deepslate_stairs");
@@ -206,7 +329,7 @@ function build(d){
   blockText(d,"CHAPTER 1", -13, 65, 18, "gold_block");
   d.runCommand("setblock -14 64 17 glowstone");
   world.setDynamicProperty(WORLD_MARK,true);
-  world.setDynamicProperty(WORLD_VERSION,3);
+  world.setDynamicProperty(WORLD_VERSION,4);
 }
 async function intro(p){
   voice(p,"havenfall");
@@ -301,8 +424,9 @@ function interactNpc(p,t){
 function inspectBlock(p,b){
   const s=stage(p);
   const x=b.location.x,y=b.location.y,z=b.location.z;
-
-  if(s===1 && ((x===7&&y===65&&z===7)||(x===11&&y===65&&z===7)||(x===7&&y===65&&z===11))){
+  if(Math.abs(x-GUIDE_X)<=1 && Math.abs(y-GUIDE_Y)<=1 && Math.abs(z-GUIDE_Z)<=1){ void guideForm(p); return; }
+  if(s===18){ return; }
+  if(s===1 && ((nearBlock(b,7,65,7))||(nearBlock(b,11,65,7))||(nearBlock(b,7,65,11)))){
     const n=Math.min(3,progress(p)+1);
     setProgress(p,n); tell(p,"Cold blue flame inspected: "+n+"/3.");
     if(n>=3){ setStage(p,2); voice(p,"chapel"); title(p,"BLUE FIRE","The silence points toward Elias."); }
@@ -312,23 +436,23 @@ function inspectBlock(p,b){
   const clueZ=[11,1,-6,-14,-22];
   if(s>=2&&s<=6){
     const idx=s-2;
-    if(x===clue[idx]&&y===64&&z===clueZ[idx]){
+    if(nearBlock(b,clue[idx],64,clueZ[idx])){
       setStage(p,s+1);
       tell(p,"Clue "+(idx+1)+"/5 recovered.");
       if(s+1===6){ voice(p,"missing_sound"); title(p,"FIND ELIAS","The forest found the mapmaker."); }
       return;
     }
   }
-  if(s===8&&x===35&&y===55&&z===-6){ setStage(p,9); tell(p,"Ash Lens recovered."); return; }
-  if(s===9&&x===41&&y===55&&z===-4){ setStage(p,10); tell(p,"Star-Iron Shard recovered."); return; }
-  if(s===10&&x===45&&y===55&&z===0){ setStage(p,11); tell(p,"Warden Seal recovered."); return; }
-  if(s===11&&x===42&&y===56&&z===-4){ setStage(p,12); tell(p,"The ring recognizes all three relics."); return; }
-  if(s===12&&x===42&&y===55&&z===6){
+  if(s===8&&nearBlock(b,35,55,-6)){ setStage(p,9); tell(p,"Ash Lens recovered."); return; }
+  if(s===9&&nearBlock(b,41,55,-4)){ setStage(p,10); tell(p,"Star-Iron Shard recovered."); return; }
+  if(s===10&&nearBlock(b,45,55,0)){ setStage(p,11); tell(p,"Warden Seal recovered."); return; }
+  if(s===11&&nearBlock(b,42,56,-4)){ setStage(p,12); tell(p,"The ring recognizes all three relics."); return; }
+  if(s===12&&nearBlock(b,42,55,6)){
     setStage(p,13); voice(p,"door_below"); title(p,"THE HOLLOW KNIGHT","You are late."); tell(p,"Hollow Knight: You are late.");
     spawnWave(p,2,"Hollow Knight Guardian");
     return;
   }
-  if(s===15&&x===45&&y===56&&z===20){
+  if(s===15&&nearBlock(b,45,56,20)){
     p.dimension.getEntities({tags:[MEMORY_TAG]}).forEach(e=>e.remove());
     void finalChoice(p); return;
   }
@@ -339,7 +463,7 @@ function advanceStory(p){
   else if(s===2&&near(p,25,64,11)) tell(p,"Inspect the first map clue.");
   else if(s===6&&near(p,39,64,-22)) tell(p,"Speak to Elias at the final clue.");
   else if(s===7&&near(p,38,64,-8))void seraChoice(p);
-  else if(s===13&&!waveAlive(p.dimension)){
+  else if(s===13&&!waveAlive(p)){
     setStage(p,14);
     voice(p,"heart");
     title(p,"THE MEMORY","Stop attacking. Something is waiting.");
@@ -378,6 +502,7 @@ world.afterEvents.playerSpawn.subscribe(e=>{
       voice(p,"cold_open");
       title(p,"CHAPTER 1","THE NIGHT THE SKY BROKE");
       tell(p,"Start at Havenfall. Mara Vale is waiting ahead.");
+      tell(p,"Ring the gold Story Guide bell near Mara whenever you need help.");
       tell(p,"The forest has gone silent.");
     } else {
       title(p,"CHAPTER 1","Continue your story.");
@@ -387,7 +512,7 @@ world.afterEvents.playerSpawn.subscribe(e=>{
   }
 });
 world.afterEvents.playerInteractWithEntity.subscribe(e=>{
-  if(e.target.typeId!=="minecraft:villager")return;
+  if(!e.target.getTags().some(t=>t.startsWith(STORY_TAG_PREFIX)))return;
   interactNpc(e.player,e.target);
 });
 world.afterEvents.playerInteractWithBlock.subscribe(e=>inspectBlock(e.player,e.block));
@@ -396,7 +521,7 @@ system.runInterval(()=>{
   for(const p of world.getPlayers()){
     if(stage(p)>=18)continue;
     build(p.dimension);
+    guideHint(p);
     advanceStory(p);
-    if(stage(p)===13 && !waveAlive(p))advanceStory(p);
   }
 },20);
