@@ -217,10 +217,112 @@ public final class StoryWorld {
 
     private static void applyWorldRevision(ServerLevel level) {
         StoryWorldRevisionSavedData revision = StoryWorldRevisionSavedData.get(level);
-        if (revision.revision() >= 2) return;
+        int current = revision.revision();
+        if (current >= 4) return;
 
-        buildChapterTitle(level, STORY_ORIGIN.getX() - 13, STORY_ORIGIN.getY() + 1, STORY_ORIGIN.getZ() + 18);
-        revision.setRevision(2);
+        if (current < 2) {
+            buildChapterTitle(level, STORY_ORIGIN.getX() - 13, STORY_ORIGIN.getY() + 1, STORY_ORIGIN.getZ() + 18);
+        }
+        buildStructuredChapterWorldV4(level);
+        revision.setRevision(4);
+    }
+
+    private static void buildStructuredChapterWorldV4(ServerLevel level) {
+        // Town hub: a readable route from spawn -> Story Guide -> Mara -> chapel -> workshop.
+        route(level, 13, 64, 20, 64, 6);
+        route(level, 20, 64, 18, 64, -2);
+        route(level, 18, 64, 10, 64, 8);
+        route(level, 18, 64, 25, 64, 11);
+
+        // The guide station is an actual interactive bell, not a decorative block.
+        level.setBlockAndUpdate(new BlockPos(20, 64, 6), Blocks.CUT_SANDSTONE.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(20, 65, 6), Blocks.BELL.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(19, 64, 6), Blocks.GOLD_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(21, 64, 6), Blocks.GOLD_BLOCK.defaultBlockState());
+
+        // Simple homes have real walkable entrances.
+        level.setBlockAndUpdate(new BlockPos(12, 64, 8), Blocks.SPRUCE_FENCE_GATE.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(28, 64, 8), Blocks.OAK_FENCE_GATE.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(4, 64, -8), Blocks.SPRUCE_FENCE_GATE.defaultBlockState());
+
+        // Light the main route so the player can orient themselves at night.
+        for (int[] lamp : new int[][]{
+                {16, 64, 6}, {18, 64, 2}, {15, 64, 4}, {21, 64, 9},
+                {28, 64, 5}, {32, 64, 0}, {35, 64, -6}, {35, 64, -14}, {39, 64, -22}
+        }) {
+            buildLamp(level, lamp[0], lamp[1], lamp[2]);
+        }
+
+        // Forest threshold: obvious boundary and safe walking corridor.
+        for (int y = 64; y <= 68; y++) {
+            level.setBlockAndUpdate(new BlockPos(27, y, -4), Blocks.STONE_BRICKS.defaultBlockState());
+            level.setBlockAndUpdate(new BlockPos(29, y, -4), Blocks.STONE_BRICKS.defaultBlockState());
+        }
+        for (int x = 27; x <= 29; x++) level.setBlockAndUpdate(new BlockPos(x, 68, -4), Blocks.STONE_BRICKS.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(28, 67, -4), Blocks.GLOWSTONE.defaultBlockState());
+        route(level, 25, 64, 28, 64, -4);
+        route(level, 28, 64, 39, 64, -22);
+
+        // Correctly connect the forest staircase to the buried Observatory.
+        buildStaircase(level, 39, 64, -18);
+        route(level, 39, 54, 39, 54, -3);
+        level.setBlockAndUpdate(new BlockPos(39, 54, -3), Blocks.SPRUCE_FENCE_GATE.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(38, 54, -3), Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(40, 54, -3), Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+        for (int y = 55; y <= 58; y++) {
+            level.setBlockAndUpdate(new BlockPos(38, y, -3), Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+            level.setBlockAndUpdate(new BlockPos(40, y, -3), Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+        }
+
+        // Observatory route -> sealed gate -> Heart Chamber.
+        route(level, 42, 54, 42, 54, 6);
+        level.setBlockAndUpdate(new BlockPos(42, 55, 6), Blocks.SPRUCE_FENCE_GATE.defaultBlockState());
+        for (int y = 55; y <= 58; y++) {
+            level.setBlockAndUpdate(new BlockPos(41, y, 6), Blocks.OBSIDIAN.defaultBlockState());
+            level.setBlockAndUpdate(new BlockPos(43, y, 6), Blocks.OBSIDIAN.defaultBlockState());
+        }
+        level.setBlockAndUpdate(new BlockPos(42, 58, 6), Blocks.OBSIDIAN.defaultBlockState());
+        route(level, 42, 54, 45, 54, 20);
+
+        // Replace the old one-block "heart" with a real room: floor, four walls, ceiling, entrance.
+        buildHeartChamber(level, 45, 54, 20);
+        level.setBlockAndUpdate(new BlockPos(45, 55, 14), Blocks.SPRUCE_FENCE_GATE.defaultBlockState());
+
+        // Every checkpoint gets a visible marker.
+        for (BlockPos pos : new BlockPos[]{
+                new BlockPos(-12, 64, 35), new BlockPos(8, 64, 8),
+                new BlockPos(25, 64, 11), new BlockPos(39, 64, -22),
+                new BlockPos(42, 55, 2), new BlockPos(42, 55, 6),
+                new BlockPos(45, 55, 15), new BlockPos(18, 64, 0)
+        }) {
+            checkpointMarker(level, pos);
+        }
+    }
+
+    private static void route(ServerLevel level, int x1, int y1, int z1, int x2, int y2, int z2) {
+        int x = x1;
+        int z = z1;
+        while (x != x2) {
+            level.setBlockAndUpdate(new BlockPos(x, y1, z), Blocks.DIRT_PATH.defaultBlockState());
+            x += Integer.signum(x2 - x);
+        }
+        while (z != z2) {
+            level.setBlockAndUpdate(new BlockPos(x, y1, z), Blocks.DIRT_PATH.defaultBlockState());
+            z += Integer.signum(z2 - z);
+        }
+        level.setBlockAndUpdate(new BlockPos(x2, y2, z2), Blocks.DIRT_PATH.defaultBlockState());
+    }
+
+    private static void buildLamp(ServerLevel level, int x, int y, int z) {
+        level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.OAK_FENCE.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(x, y + 1, z), Blocks.OAK_FENCE.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(x, y + 2, z), Blocks.LANTERN.defaultBlockState());
+    }
+
+    private static void checkpointMarker(ServerLevel level, BlockPos pos) {
+        level.setBlockAndUpdate(pos, Blocks.GOLD_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(pos.above(), Blocks.AMETHYST_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(pos.above(2), Blocks.GLOWSTONE.defaultBlockState());
     }
 
     private static void buildChapterTitle(ServerLevel level, int x, int y, int z) {
@@ -308,9 +410,9 @@ public final class StoryWorld {
     }
 
     private static void buildStaircase(ServerLevel level, int x, int y, int z) {
-        for (int i = 0; i < 8; i++) {
-            int yy = y - i / 2;
-            int zz = z - i;
+        for (int i = 0; i < 20; i++) {
+            int yy = y - 1 - i / 2;
+            int zz = z + i;
             level.setBlockAndUpdate(new BlockPos(x, yy, zz), Blocks.POLISHED_DEEPSLATE_STAIRS.defaultBlockState());
             level.setBlockAndUpdate(new BlockPos(x - 1, yy, zz), Blocks.COBBLED_DEEPSLATE.defaultBlockState());
             level.setBlockAndUpdate(new BlockPos(x + 1, yy, zz), Blocks.COBBLED_DEEPSLATE.defaultBlockState());
@@ -344,15 +446,30 @@ public final class StoryWorld {
     private static void buildHeartChamber(ServerLevel level, int x, int y, int z) {
         for (int dx = -6; dx <= 6; dx++) {
             for (int dz = -6; dz <= 6; dz++) {
-                if (Math.abs(dx) == 6 || Math.abs(dz) == 6) {
-                    level.setBlockAndUpdate(new BlockPos(x + dx, y, z + dz), Blocks.OBSIDIAN.defaultBlockState());
-                } else {
-                    level.setBlockAndUpdate(new BlockPos(x + dx, y, z + dz), Blocks.DEEPSLATE.defaultBlockState());
-                }
+                boolean edge = Math.abs(dx) == 6 || Math.abs(dz) == 6;
+                level.setBlockAndUpdate(new BlockPos(x + dx, y, z + dz),
+                        edge ? Blocks.OBSIDIAN.defaultBlockState() : Blocks.POLISHED_DEEPSLATE.defaultBlockState());
             }
         }
+        for (int wallY = y + 1; wallY <= y + 4; wallY++) {
+            for (int dx = -6; dx <= 6; dx++) {
+                level.setBlockAndUpdate(new BlockPos(x + dx, wallY, z - 6), Blocks.OBSIDIAN.defaultBlockState());
+                level.setBlockAndUpdate(new BlockPos(x + dx, wallY, z + 6), Blocks.OBSIDIAN.defaultBlockState());
+            }
+            for (int dz = -6; dz <= 6; dz++) {
+                level.setBlockAndUpdate(new BlockPos(x - 6, wallY, z + dz), Blocks.OBSIDIAN.defaultBlockState());
+                level.setBlockAndUpdate(new BlockPos(x + 6, wallY, z + dz), Blocks.OBSIDIAN.defaultBlockState());
+            }
+        }
+        for (int dx = -6; dx <= 6; dx++) for (int dz = -6; dz <= 6; dz++) {
+            level.setBlockAndUpdate(new BlockPos(x + dx, y + 5, z + dz), Blocks.OBSIDIAN.defaultBlockState());
+        }
+        // South entrance / player-facing approach.
+        for (int yy = y + 1; yy <= y + 2; yy++) level.setBlockAndUpdate(new BlockPos(x, yy, z - 6), Blocks.AIR.defaultBlockState());
+
         level.setBlockAndUpdate(new BlockPos(x, y + 1, z), Blocks.CRYING_OBSIDIAN.defaultBlockState());
         level.setBlockAndUpdate(new BlockPos(x, y + 2, z), Blocks.AMETHYST_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(x, y + 3, z), Blocks.GLOWSTONE.defaultBlockState());
     }
 
     private static void buildHouse(ServerLevel level, int x, int y, int z, int width, int depth, BlockState wall, BlockState roof) {
