@@ -15,9 +15,9 @@ const STORY_TAG_PREFIX = "minecraftstory_npc:";
 const WAVE_TAG = "minecraftstory_wave";
 
 const NPCS = [
-  ["mara", "Mara Vale", 20, 64, 0],
-  ["elias", "Elias Venn", 24, 64, 4],
-  ["cael", "Brother Cael", 10, 64, 8],
+  ["mara", "Mara Vale", 18, 64, -2],
+  ["elias", "Elias Venn", 23, 64, 4],
+  ["cael", "Brother Cael", 16, 64, 8],
   ["sera", "Sera Voss", 38, 64, -8],
   ["bram", "Bram the Baker", 28, 64, 8],
   ["nessa", "Nessa the Blacksmith", 0, 64, -8],
@@ -130,7 +130,7 @@ function guideHint(p){
     18:"CHAPTER 1 COMPLETE — Chapter 2 is coming soon."
   };
   const text=hints[s]||"Follow the current Chapter 1 objective.";
-  try{ p.onScreenDisplay.setActionBar("§6CHAPTER 1§r • §f"+text+" §8["+n+"]"); }catch(_e){}
+  try{ p.onScreenDisplay.setActionBar("§6CHAPTER 1§r • §f"+text+" §8[STEP "+s+"/18]"); }catch(_e){}
 }
 async function guideForm(p){
   const s=stage(p), n=progress(p);
@@ -217,6 +217,12 @@ function patchWorldV4(d){
   d.runCommand("fill 20 64 6 25 64 11 dirt_path");
   d.runCommand("setblock 20 64 6 cut_sandstone");
   d.runCommand("setblock 20 65 6 bell");
+  d.runCommand("setblock 7 65 7 air");
+  d.runCommand("setblock 11 65 7 air");
+  d.runCommand("setblock 7 65 11 air");
+  d.runCommand("setblock 8 65 8 soul_fire");
+  d.runCommand("setblock 12 65 8 soul_fire");
+  d.runCommand("setblock 8 65 12 soul_fire");
   d.runCommand("setblock 19 64 6 gold_block");
   d.runCommand("setblock 21 64 6 gold_block");
 
@@ -286,7 +292,7 @@ function build(d){
   d.runCommand("fill -60 64 34 60 64 34 sand");
   d.runCommand("fill 4 64 4 14 68 14 stone_bricks");
   d.runCommand("fill 6 65 6 12 67 12 air");
-  for(const p of ["7 65 7","11 65 7","7 65 11"]) d.runCommand("setblock "+p+" soul_fire");
+  for(const p of ["8 65 8","12 65 8","8 65 12"]) d.runCommand("setblock "+p+" soul_fire");
   d.runCommand("fill 38 53 14 52 53 26 obsidian");
   d.runCommand("fill 39 54 15 51 56 25 air");
   d.runCommand("fill 34 54 -11 49 54 20 deepslate");
