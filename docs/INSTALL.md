@@ -5,8 +5,8 @@
 Open the latest stable GitHub Release.
 
 - Java Edition: download the Minecraft Story `.jar`.
-- Bedrock Edition: download the Minecraft Story `.mcaddon`.
-- Bedrock fallback: the same release also contains separate Behavior Pack and Resource Pack `.mcpack` files.
+- Bedrock Edition: download the ready-to-play Minecraft Story `.mcworld`.
+- Bedrock fallback: the same release also contains a `.mcaddon` and separate Behavior Pack and Resource Pack `.mcpack` files.
 
 Voice audio is already bundled. There is no separate audio package.
 
@@ -20,11 +20,11 @@ Story NPCs are persistent and the world contains a visible `CHAPTER 1` block tit
 
 ## Bedrock Edition
 
-Open the downloaded `.mcaddon` with Minecraft Bedrock and let Minecraft import it.
+**Recommended: use the `.mcworld`.** Open the downloaded `minecraft-story-bedrock-world-*.mcworld` with Minecraft Bedrock, let Minecraft import it, then open the imported world and press **Play**.
 
-Create a new world and enable the imported Minecraft Story behavior/resource packs.
+The `.mcworld` already contains the Chapter 1 world, story behavior pack, voice resource pack, voice audio, and pack activation state. You do **not** need to create another world or enable packs manually.
 
-If your device does not register both packs from the `.mcaddon`, import the matching behavior `.mcpack` and resource `.mcpack` separately from the same release.
+Use the `.mcaddon` only as a fallback import option. Use the separate `.mcpack` files only when your device requires manual pack imports.
 
 The voice pack and story scripts are included in the release.
 
@@ -35,6 +35,16 @@ Android and iPhone/iPad use the Bedrock `.mcaddon` import flow. The individual `
 ## Consoles
 
 Xbox, PlayStation and Switch use the Bedrock edition. Console add-on access depends on the supported Bedrock world/Realm workflow for that platform.
+
+## You are on the server
+
+Treat the adventure like a guided story server. Your screen shows **CHAPTER 1** and the current **NEXT** objective.
+
+When you spawn, follow the lantern/gold route into Havenfall and talk to the glowing named NPC.
+
+Story objects use gold, amethyst, glowstone, unusual blocks, or a clearly marked structure. Interact with the object only when the current **NEXT** objective tells you to.
+
+Near the Havenfall guide station, ring the **Story Guide** bell whenever you are lost. On Java, `/story guide` gives the same help in chat. Death returns you to your latest Chapter 1 checkpoint.
 
 ## Chapter 1
 
