@@ -446,7 +446,9 @@ public final class StoryQuestSystem {
     public static void sendGuide(ServerPlayer player, StoryState state) {
         String hint = currentObjectiveHint(state);
         player.sendSystemMessage(Component.literal("=== MINECRAFT STORY • CHAPTER 1 GUIDE ==="), false);
-        String questId = currentQuestId(state);\n        int target = questId == null ? 0 : StoryQuest.objectives(questId).size();\n        player.sendSystemMessage(Component.literal("Quest: " + state.activeQuest() + " [" + state.questProgress() + "/" + target + "]"), false);
+        String questId = currentQuestId(state);
+        int target = questId == null ? 0 : StoryQuest.objectives(questId).size();
+        player.sendSystemMessage(Component.literal("Quest: " + state.activeQuest() + " [" + state.questProgress() + "/" + target + "]"), false);
         player.sendSystemMessage(Component.literal("NEXT: " + hint), false);
         player.sendSystemMessage(Component.literal("How: follow the gold/lantern route, then interact with the glowing NPC or marked story object. Relics can be right-clicked for a reminder."), false);
         player.sendSystemMessage(Component.literal("Respawn: death returns you to your latest Chapter 1 checkpoint."), false);
