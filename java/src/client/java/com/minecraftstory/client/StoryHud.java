@@ -12,6 +12,7 @@ public final class StoryHud {
     private static String quest = "";
     private static int progress;
     private static int target;
+    private static String hint = "";
 
     private StoryHud() {}
 
@@ -23,10 +24,11 @@ public final class StoryHud {
         );
     }
 
-    public static void setQuest(String activeQuest, int questProgress, int questTarget) {
+    public static void setQuest(String activeQuest, int questProgress, int questTarget, String objectiveHint) {
         quest = activeQuest == null ? "" : activeQuest;
         progress = Math.max(0, questProgress);
         target = Math.max(0, questTarget);
+        hint = objectiveHint == null ? "" : objectiveHint;
     }
 
     private static void extract(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
@@ -36,7 +38,7 @@ public final class StoryHud {
         int width = Math.min(360, minecraft.getWindow().getGuiScaledWidth() - 24);
         int x = 12;
         int y = 12;
-        int height = 44;
+        int height = 62;
 
         graphics.fill(x, y, x + width, y + height, 0xCC111318);
         graphics.outline(x, y, width, height, 0xFF6E7785);
@@ -44,7 +46,9 @@ public final class StoryHud {
         graphics.text(minecraft.font,
                 Component.literal(quest + "  [" + progress + "/" + target + "]"),
                 x + 10, y + 20, 0xFFFFFFFF, true);
-        graphics.text(minecraft.font, Component.literal("Follow the objective • Explore • Interact"),
-                x + 10, y + 32, 0xFFB8C0CC, false);
+        graphics.text(minecraft.font, Component.literal("NEXT: " + hint),
+                x + 10, y + 35, 0xFFB8C0CC, false);
+        graphics.text(minecraft.font, Component.literal("Interact with the marked NPC/object • /story guide"),
+                x + 10, y + 49, 0xFF9EA6B4, false);
     }
 }
