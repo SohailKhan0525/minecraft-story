@@ -1,14 +1,17 @@
 package com.minecraftstory.story;
 
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.util.Prediction;
 
 public final class StoryItems {
     public static final Item ASH_LENS = register("ash_lens");
@@ -28,7 +31,31 @@ public final class StoryItems {
     }
 
     public static void register() {
-        // Static initialization performs registration; this method provides a clear lifecycle hook.
+        UseItemCallback.EVENT.register((player, level, hand) -> {
+            if (level.isClientSide()) return InteractionResult.PASS;
+            if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.PASS;
+
+            Item item = serverPlayer.getItemInHand(hand).getItem();
+            if (item == ASH_LENS) {
+                serverPlayer.displayClientMessage(Component.literal(
+                        "Ash Lens: a relic recovered from the Observatory. Carry it to the ring mechanism."
+                ), true);
+                return InteractionResult.SUCCESS;
+            }
+            if (item == STAR_IRON_SHARD) {
+                serverPlayer.displayClientMessage(Component.literal(
+                        "Star-Iron Shard: slot it into the Observatory ring after the Ash Lens."
+                ), true);
+                return InteractionResult.SUCCESS;
+            }
+            if (item == WARDEN_SEAL) {
+                serverPlayer.displayClientMessage(Component.literal(
+                        "Warden Seal: the final relic. Use the ring, then open the marked gate."
+                ), true);
+                return InteractionResult.SUCCESS;
+            }
+            return InteractionResult.PASS;
+        });
     }
 
     public static boolean has(ServerPlayer player, Item item) {
@@ -47,8 +74,9 @@ public final class StoryItems {
     }
 
     public static void give(ServerPlayer player, Item item) {
-        if (!player.getInventory().add(new ItemStack(item))) {
-            player.drop(new ItemStack(item), false, Prediction.SERVER_ONLY);
+        ItemStack stack = new ItemStack(item);
+        if (!player.getInventory().add(stack)) {
+            player.drop(stack, false, Prediction.SERVER_ONLY);
         }
     }
 }
