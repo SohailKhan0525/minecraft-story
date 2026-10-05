@@ -37,7 +37,7 @@ public final class StoryItems {
 
             Item item = serverPlayer.getItemInHand(hand).getItem();
             if (item == ASH_LENS) {
-                serverPlayer.displayClientMessage(Component.literal(
+                serverPlayer.sendSystemMessage(Component.literal(
                         "Ash Lens: a relic recovered from the Observatory. Carry it to the ring mechanism."
                 ), true);
                 return InteractionResult.SUCCESS;
