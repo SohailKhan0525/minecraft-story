@@ -279,11 +279,38 @@ function patchWorldV4(d){
   world.setDynamicProperty(WORLD_VERSION,4);
 }
 
+function patchWorldV5(d){
+  // Enclosed buried Observatory with a real entrance from the staircase.
+  d.runCommand("fill 31 54 -17 45 54 -3 polished_deepslate");
+  d.runCommand("fill 31 55 -17 31 58 -3 deepslate_bricks");
+  d.runCommand("fill 45 55 -17 45 58 -3 deepslate_bricks");
+  d.runCommand("fill 31 55 -17 45 58 -17 deepslate_bricks");
+  d.runCommand("fill 31 55 -3 45 58 -3 deepslate_bricks");
+  d.runCommand("fill 31 59 -17 45 59 -3 deepslate_tiles");
+  d.runCommand("fill 32 55 -16 44 58 -4 air");
+  d.runCommand("fill 39 55 -3 40 56 -3 air");
+  d.runCommand("setblock 39 54 -3 polished_deepslate");
+  d.runCommand("setblock 39 55 -3 spruce_fence_gate");
+  d.runCommand("setblock 42 55 -4 iron_bars");
+  d.runCommand("setblock 38 55 -10 cartography_table");
+  d.runCommand("setblock 38 56 -10 amethyst_block");
+  d.runCommand("setblock 42 55 -4 iron_bars");
+  d.runCommand("setblock 38 57 -10 glowstone");
+  d.runCommand("fill 34 54 -16 42 54 -14 polished_deepslate");
+  d.runCommand("fill 34 54 -16 34 55 -14 gold_block");
+  d.runCommand("fill 42 54 -16 42 55 -14 gold_block");
+  d.runCommand("fill -14 64 18 14 64 20 stone_bricks");
+  blockText(d,"CHAPTER 1",-13,65,18,"gold_block");
+  d.runCommand("setblock 20 65 6 bell");
+  world.setDynamicProperty(WORLD_VERSION,5);
+}
+
 function build(d){
   const version=Number(world.getDynamicProperty(WORLD_VERSION)??0);
-  if(world.getDynamicProperty(WORLD_MARK) && version>=4)return;
-  if(world.getDynamicProperty(WORLD_MARK) && version<4){
-    patchWorldV4(d);
+  if(world.getDynamicProperty(WORLD_MARK) && version>=5)return;
+  if(world.getDynamicProperty(WORLD_MARK) && version<5){
+    if(version<4) patchWorldV4(d);
+    patchWorldV5(d);
     return;
   }
   d.runCommand("fill -60 63 -50 60 63 38 grass_block");
@@ -336,6 +363,7 @@ function build(d){
   d.runCommand("setblock -14 64 17 glowstone");
   world.setDynamicProperty(WORLD_MARK,true);
   world.setDynamicProperty(WORLD_VERSION,4);
+  patchWorldV5(d);
 }
 async function intro(p){
   voice(p,"havenfall");
