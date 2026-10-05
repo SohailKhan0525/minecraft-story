@@ -15,7 +15,7 @@ public final class MinecraftStoryClient implements ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(StoryNetwork.QuestHudState.TYPE, (payload, context) ->
                 context.client().execute(() ->
-                        StoryClientState.updateQuest(payload.quest(), payload.progress(), payload.target())
+                        StoryClientState.updateQuest(payload.quest(), payload.progress(), payload.target(), payload.hint())
                 ));
 
         ClientPlayNetworking.registerGlobalReceiver(StoryNetwork.CinematicCue.TYPE, (p,c) -> c.client().execute(() -> StoryCinematic.play(p.title(), p.subtitle(), p.duration())));
