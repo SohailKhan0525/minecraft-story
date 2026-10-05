@@ -115,6 +115,24 @@ def main() -> int:
 
     if "PROFILES =" in generator or "PROFILES = {" in generator:
         raise SystemExit("Voice identities must come from the canonical profile manifest only.")
+    # Java Chapter 1 must ship the interactive relic item definitions.
+    item_files = [
+        ROOT / "java/src/main/resources/assets/minecraftstory/items/ash_lens.json",
+        ROOT / "java/src/main/resources/assets/minecraftstory/items/star_iron_shard.json",
+        ROOT / "java/src/main/resources/assets/minecraftstory/items/warden_seal.json",
+        ROOT / "java/src/main/resources/assets/minecraftstory/lang/en_us.json",
+    ]
+    for item_file in item_files:
+        if not item_file.is_file():
+            raise SystemExit("Missing Java story item asset: " + str(item_file.relative_to(ROOT)))
+    story_items = (ROOT / "java/src/main/java/com/minecraftstory/story/StoryItems.java").read_text(encoding="utf-8")
+    if "UseItemCallback.EVENT" not in story_items:
+        raise SystemExit("Java story relics are missing usable-item behavior.")
+    story_world = (ROOT / "java/src/main/java/com/minecraftstory/world/StoryWorld.java").read_text(encoding="utf-8")
+    for marker in ("buildStructuredChapterWorldV4", "Blocks.BELL", "buildStaircase(level, 39, 64, -18)"):
+        if marker not in story_world:
+            raise SystemExit("Java world structure is missing: " + marker)
+
     package_tool = (ROOT / "tools/package_bedrock_addon.py").read_text(encoding="utf-8")
     for required_marker in ("world_behavior_packs.json", "world_resource_packs.json", "SampleParkourWorld.mcworld", "minecraft-story-chapter-1.mcworld"):
         if required_marker not in package_tool:
