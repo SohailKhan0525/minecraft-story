@@ -47,6 +47,14 @@ def main() -> int:
         raise SystemExit("Shared voice profile manifest is missing or invalid.")
 
     js = (BP / "scripts/main.js").read_text(encoding="utf-8")
+    for marker in (
+        '[8,65,8]', '[12,65,8]', '[8,65,12]',
+        'setblock 20 65 6 bell',
+        'function guideHint', 'function patchWorldV4',
+        'STEP "+s+"/18'
+    ):
+        if marker not in js:
+            raise SystemExit(f"Bedrock runtime is missing structured Chapter 1 marker: {marker}")
     if "playSound" not in js or "minecraftstory:voice." not in js:
         raise SystemExit("Bedrock runtime is missing player-local voice playback.")
     if 'minecraft:villager_v2<minecraft:ageable_grow_up>' not in js or 'initialPersistence:true' not in js:
