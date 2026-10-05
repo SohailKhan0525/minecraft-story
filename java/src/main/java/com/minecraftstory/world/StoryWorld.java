@@ -265,6 +265,7 @@ public final class StoryWorld {
 
         // Correctly connect the forest staircase to the buried Observatory.
         buildStaircase(level, 39, 64, -18);
+        buildObservatory(level, 38, 54, -10);
         route(level, 39, 54, 1, 39, 54, -3);
         level.setBlockAndUpdate(new BlockPos(39, 54, -3), Blocks.SPRUCE_FENCE_GATE.defaultBlockState());
         level.setBlockAndUpdate(new BlockPos(38, 54, -3), Blocks.POLISHED_DEEPSLATE.defaultBlockState());
@@ -422,12 +423,33 @@ public final class StoryWorld {
     private static void buildObservatory(ServerLevel level, int x, int y, int z) {
         for (int dx = -7; dx <= 7; dx++) {
             for (int dz = -7; dz <= 7; dz++) {
-                boolean wall = Math.abs(dx) == 7 || Math.abs(dz) == 7;
+                boolean edge = Math.abs(dx) == 7 || Math.abs(dz) == 7;
                 level.setBlockAndUpdate(new BlockPos(x + dx, y, z + dz),
-                        wall ? Blocks.DEEPSLATE_BRICKS.defaultBlockState() : Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+                        edge ? Blocks.DEEPSLATE_BRICKS.defaultBlockState() : Blocks.POLISHED_DEEPSLATE.defaultBlockState());
             }
         }
-        makeMarker(level, x, y, z, Blocks.CHISELED_DEEPSLATE.defaultBlockState());
+        for (int wallY = y + 1; wallY <= y + 4; wallY++) {
+            for (int dx = -7; dx <= 7; dx++) {
+                level.setBlockAndUpdate(new BlockPos(x + dx, wallY, z - 7), Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+                level.setBlockAndUpdate(new BlockPos(x + dx, wallY, z + 7), Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+            }
+            for (int dz = -7; dz <= 7; dz++) {
+                level.setBlockAndUpdate(new BlockPos(x - 7, wallY, z + dz), Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+                level.setBlockAndUpdate(new BlockPos(x + 7, wallY, z + dz), Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+            }
+        }
+        for (int dx = -7; dx <= 7; dx++) for (int dz = -7; dz <= 7; dz++) {
+            level.setBlockAndUpdate(new BlockPos(x + dx, y + 5, z + dz), Blocks.DEEPSLATE_TILES.defaultBlockState());
+        }
+        // South entrance aligns with the staircase/route.
+        for (int wallY = y + 1; wallY <= y + 2; wallY++) {
+            level.setBlockAndUpdate(new BlockPos(x + 1, wallY, z + 7), Blocks.AIR.defaultBlockState());
+            level.setBlockAndUpdate(new BlockPos(x, wallY, z + 7), Blocks.AIR.defaultBlockState());
+        }
+        level.setBlockAndUpdate(new BlockPos(x, y + 1, z), Blocks.CHISELED_DEEPSLATE.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(x, y + 2, z), Blocks.AMETHYST_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(x, y + 3, z), Blocks.GLOWSTONE.defaultBlockState());
+        makeMarker(level, x, y, z - 6, Blocks.CARTOGRAPHY_TABLE.defaultBlockState());
     }
 
     private static void buildObservatoryRings(ServerLevel level, int x, int y, int z) {
