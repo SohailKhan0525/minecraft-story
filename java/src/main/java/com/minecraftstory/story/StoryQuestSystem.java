@@ -68,6 +68,10 @@ public final class StoryQuestSystem {
 
     public static void onQuestBlockInteraction(ServerPlayer player, net.minecraft.core.BlockPos pos) {
         StoryState state = StorySessionManager.state(player);
+        if (near(pos, 20, 65, 6)) {
+            sendGuide(player, state);
+            return;
+        }
         switch (state.activeQuest()) {
             case "Find Elias" -> {
                 if (pos.equals(new net.minecraft.core.BlockPos(25, 64, 11)) && state.questProgress() == 0) {
@@ -132,7 +136,7 @@ public final class StoryQuestSystem {
                 }
             }
             case "The Hollow Knight" -> {
-                if (state.questProgress() == 3 && pos.equals(new net.minecraft.core.BlockPos(45, 56, 20))) {
+                if (state.questProgress() == 3 && near(pos, 45, 56, 20)) {
                     if (hasMemoryBoss(player)) {
                         playerHint(player, "The memory cannot be defeated. Touch the Heart and let it remember.");
                         setProgress(player, state, 4, "You touch the Heart. The memory dissolves without a fight.");
@@ -144,7 +148,7 @@ public final class StoryQuestSystem {
                 }
             }
             case "The Heart of the Observatory" -> {
-                if (pos.equals(new net.minecraft.core.BlockPos(45, 56, 20)) && state.questProgress() >= 4) {
+                if (near(pos, 45, 56, 20) && state.questProgress() >= 4) {
                     player.sendSystemMessage(net.minecraft.network.chat.Component.literal(
                             "The Heart waits for you. Seal it, touch it, or try to destroy it."
                     ), true);
@@ -152,24 +156,34 @@ public final class StoryQuestSystem {
                 }
             }
             case "The Door Beneath the World" -> {
-                if (pos.equals(new net.minecraft.core.BlockPos(35, 55, -6)) && state.questProgress() == 0) {
+                if (near(pos, 35, 55, -6) && state.questProgress() == 0) {
                     StoryItems.give(player, StoryItems.ASH_LENS);
                     setProgress(player, state, 1, "Ash Lens recovered.");
-                } else if (pos.equals(new net.minecraft.core.BlockPos(41, 55, -4)) && state.questProgress() == 1) {
+                } else if (near(pos, 41, 55, -4) && state.questProgress() == 1) {
                     StoryItems.give(player, StoryItems.STAR_IRON_SHARD);
                     setProgress(player, state, 2, "Star-Iron Shard recovered.");
-                } else if (pos.equals(new net.minecraft.core.BlockPos(45, 55, 0)) && state.questProgress() == 2) {
+                } else if (near(pos, 45, 55, 0) && state.questProgress() == 2) {
                     StoryItems.give(player, StoryItems.WARDEN_SEAL);
                     setProgress(player, state, 3, "Warden Seal recovered.");
-                } else if (pos.equals(new net.minecraft.core.BlockPos(42, 56, -4)) && state.questProgress() == 3
+                } else if (near(pos, 42, 56, -4) && state.questProgress() == 3
                         && StoryItems.has(player, StoryItems.ASH_LENS)
                         && StoryItems.has(player, StoryItems.STAR_IRON_SHARD)
                         && StoryItems.has(player, StoryItems.WARDEN_SEAL)) {
                     setProgress(player, state, 4, "The Observatory ring recognizes the three relics.");
-                } else if (pos.equals(new net.minecraft.core.BlockPos(42, 55, 6)) && state.questProgress() == 4
-                        && StoryItems.consume(player, StoryItems.ASH_LENS)
-                        && StoryItems.consume(player, StoryItems.STAR_IRON_SHARD)
-                        && StoryItems.consume(player, StoryItems.WARDEN_SEAL)) {
+                } else if (near(pos, 42, 55, 6) && state.questProgress() == 4) {
+                    boolean ready = StoryItems.has(player, StoryItems.ASH_LENS)
+                            && StoryItems.has(player, StoryItems.STAR_IRON_SHARD)
+                            && StoryItems.has(player, StoryItems.WARDEN_SEAL);
+                    if (!ready) {
+                        String missing = (!StoryItems.has(player, StoryItems.ASH_LENS) ? "Ash Lens, " : "")
+                                + (!StoryItems.has(player, StoryItems.STAR_IRON_SHARD) ? "Star-Iron Shard, " : "")
+                                + (!StoryItems.has(player, StoryItems.WARDEN_SEAL) ? "Warden Seal" : "");
+                        playerHint(player, "The gate is locked. Missing: " + missing.replaceAll(", $", ""));
+                        return;
+                    }
+                    StoryItems.consume(player, StoryItems.ASH_LENS);
+                    StoryItems.consume(player, StoryItems.STAR_IRON_SHARD);
+                    StoryItems.consume(player, StoryItems.WARDEN_SEAL);
                     setProgress(player, state, 5, "The door beneath the world opens."); 
                 }
             }
@@ -416,6 +430,31 @@ public final class StoryQuestSystem {
         }
         entity.addTag("minecraftstory_heart_wave");
         level.addFreshEntity(entity);
+    }
+
+    public static String currentObjectiveHint(StoryState state) {
+        if (state.has(StoryFlag.CHAPTER_1_COMPLETE)) {
+            return "Chapter 1 complete. Return to Havenfall for the post-credit scene.";
+        }
+        String id = questId(state.activeQuest());
+        if (id == null) return "Ring the Story Guide bell at Havenfall.";
+        var objectives = StoryQuest.objectives(id);
+        int index = Math.max(0, Math.min(state.questProgress(), objectives.size() - 1));
+        return objectives.get(index).description();
+    }
+
+    public static void sendGuide(ServerPlayer player, StoryState state) {
+        String hint = currentObjectiveHint(state);
+        player.sendSystemMessage(Component.literal("=== MINECRAFT STORY • CHAPTER 1 GUIDE ==="), false);
+        player.sendSystemMessage(Component.literal("Quest: " + state.activeQuest() + " [" + state.questProgress() + "/" + StoryQuest.objectives(currentQuestId(state)).size() + "]"), false);
+        player.sendSystemMessage(Component.literal("NEXT: " + hint), false);
+        player.sendSystemMessage(Component.literal("How: follow the gold/lantern route, then interact with the glowing NPC or marked story object. Relics can be right-clicked for a reminder."), false);
+        player.sendSystemMessage(Component.literal("Respawn: death returns you to your latest Chapter 1 checkpoint."), false);
+        StoryNetwork.syncQuest(player, state);
+    }
+
+    private static boolean near(net.minecraft.core.BlockPos pos, int x, int y, int z) {
+        return Math.abs(pos.getX() - x) <= 1 && Math.abs(pos.getY() - y) <= 1 && Math.abs(pos.getZ() - z) <= 1;
     }
 
     private static void playerHint(ServerPlayer player, String text) {
