@@ -32,6 +32,11 @@ public final class StoryCommands {
                         context.getSource().sendSuccess(() -> Component.literal("Choice recorded: " + choice), false);
                         return 1;
                     })))
+                .then(Commands.literal("guide").executes(context -> {
+                    var player = context.getSource().getPlayerOrException();
+                    StoryQuestSystem.sendGuide(player, state(context));
+                    return 1;
+                }))
                 .then(Commands.literal("status").executes(context -> {
                     StoryState state = state(context);
                     context.getSource().sendSuccess(() -> Component.literal(
