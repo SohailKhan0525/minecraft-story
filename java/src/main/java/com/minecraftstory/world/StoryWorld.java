@@ -218,13 +218,16 @@ public final class StoryWorld {
     private static void applyWorldRevision(ServerLevel level) {
         StoryWorldRevisionSavedData revision = StoryWorldRevisionSavedData.get(level);
         int current = revision.revision();
-        if (current >= 4) return;
+        if (current >= 5) return;
 
         if (current < 2) {
             buildChapterTitle(level, STORY_ORIGIN.getX() - 13, STORY_ORIGIN.getY() + 1, STORY_ORIGIN.getZ() + 18);
         }
-        buildStructuredChapterWorldV4(level);
-        revision.setRevision(4);
+        if (current < 4) {
+            buildStructuredChapterWorldV4(level);
+        }
+        buildStructuredChapterWorldV5(level);
+        revision.setRevision(5);
     }
 
     private static void buildStructuredChapterWorldV4(ServerLevel level) {
