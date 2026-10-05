@@ -229,10 +229,10 @@ public final class StoryWorld {
 
     private static void buildStructuredChapterWorldV4(ServerLevel level) {
         // Town hub: a readable route from spawn -> Story Guide -> Mara -> chapel -> workshop.
-        route(level, 13, 64, 20, 64, 6);
-        route(level, 20, 64, 18, 64, -2);
-        route(level, 18, 64, 10, 64, 8);
-        route(level, 18, 64, 25, 64, 11);
+        route(level, 13, 64, 6, 20, 64, 6);
+        route(level, 20, 64, 6, 18, 64, -2);
+        route(level, 18, 64, -2, 16, 64, 8);
+        route(level, 18, 64, -2, 23, 64, 4);
 
         // The guide station is an actual interactive bell, not a decorative block.
         level.setBlockAndUpdate(new BlockPos(20, 64, 6), Blocks.CUT_SANDSTONE.defaultBlockState());
@@ -260,12 +260,12 @@ public final class StoryWorld {
         }
         for (int x = 27; x <= 29; x++) level.setBlockAndUpdate(new BlockPos(x, 68, -4), Blocks.STONE_BRICKS.defaultBlockState());
         level.setBlockAndUpdate(new BlockPos(28, 67, -4), Blocks.GLOWSTONE.defaultBlockState());
-        route(level, 25, 64, 28, 64, -4);
-        route(level, 28, 64, 39, 64, -22);
+        route(level, 25, 64, 11, 28, 64, -4);
+        route(level, 28, 64, -4, 39, 64, -22);
 
         // Correctly connect the forest staircase to the buried Observatory.
         buildStaircase(level, 39, 64, -18);
-        route(level, 39, 54, 39, 54, -3);
+        route(level, 39, 54, 1, 39, 54, -3);
         level.setBlockAndUpdate(new BlockPos(39, 54, -3), Blocks.SPRUCE_FENCE_GATE.defaultBlockState());
         level.setBlockAndUpdate(new BlockPos(38, 54, -3), Blocks.POLISHED_DEEPSLATE.defaultBlockState());
         level.setBlockAndUpdate(new BlockPos(40, 54, -3), Blocks.POLISHED_DEEPSLATE.defaultBlockState());
@@ -275,14 +275,14 @@ public final class StoryWorld {
         }
 
         // Observatory route -> sealed gate -> Heart Chamber.
-        route(level, 42, 54, 42, 54, 6);
+        route(level, 39, 54, -3, 42, 54, 6);
         level.setBlockAndUpdate(new BlockPos(42, 55, 6), Blocks.SPRUCE_FENCE_GATE.defaultBlockState());
         for (int y = 55; y <= 58; y++) {
             level.setBlockAndUpdate(new BlockPos(41, y, 6), Blocks.OBSIDIAN.defaultBlockState());
             level.setBlockAndUpdate(new BlockPos(43, y, 6), Blocks.OBSIDIAN.defaultBlockState());
         }
         level.setBlockAndUpdate(new BlockPos(42, 58, 6), Blocks.OBSIDIAN.defaultBlockState());
-        route(level, 42, 54, 45, 54, 20);
+        route(level, 42, 54, 6, 45, 54, 14);
 
         // Replace the old one-block "heart" with a real room: floor, four walls, ceiling, entrance.
         buildHeartChamber(level, 45, 54, 20);
