@@ -48,7 +48,7 @@ def main() -> int:
 
     js = (BP / "scripts/main.js").read_text(encoding="utf-8")
     for marker in (
-        '[8,65,8]', '[12,65,8]', '[8,65,12]',
+        'nearBlock(b,8,65,8)', 'nearBlock(b,12,65,8)', 'nearBlock(b,8,65,12)',
         'setblock 20 65 6 bell',
         'function guideHint', 'function patchWorldV4',
         'STEP "+s+"/18'
