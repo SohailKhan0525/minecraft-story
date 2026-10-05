@@ -230,6 +230,19 @@ public final class StoryWorld {
         revision.setRevision(5);
     }
 
+    private static void buildStructuredChapterWorldV5(ServerLevel level) {
+        buildObservatory(level, 38, 54, -10);
+        route(level, 39, 54, 1, 39, 54, -3);
+        level.setBlockAndUpdate(new BlockPos(39, 54, -3), Blocks.SPRUCE_FENCE_GATE.defaultBlockState());
+        for (int wallY = 55; wallY <= 58; wallY++) {
+            level.setBlockAndUpdate(new BlockPos(38, wallY, -3), Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+            level.setBlockAndUpdate(new BlockPos(40, wallY, -3), Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+        }
+        level.setBlockAndUpdate(new BlockPos(39, 55, -3), Blocks.AIR.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(39, 56, -3), Blocks.AIR.defaultBlockState());
+        level.setBlockAndUpdate(new BlockPos(39, 54, -3), Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+    }
+
     private static void buildStructuredChapterWorldV4(ServerLevel level) {
         // Town hub: a readable route from spawn -> Story Guide -> Mara -> chapel -> workshop.
         route(level, 13, 64, 6, 20, 64, 6);
