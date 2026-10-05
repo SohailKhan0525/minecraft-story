@@ -432,7 +432,7 @@ function inspectBlock(p,b){
   const x=b.location.x,y=b.location.y,z=b.location.z;
   if(Math.abs(x-GUIDE_X)<=1 && Math.abs(y-GUIDE_Y)<=1 && Math.abs(z-GUIDE_Z)<=1){ void guideForm(p); return; }
   if(s===18){ return; }
-  if(s===1 && ((nearBlock(b,7,65,7))||(nearBlock(b,11,65,7))||(nearBlock(b,7,65,11)))){
+  if(s===1 && ((nearBlock(b,8,65,8))||(nearBlock(b,12,65,8))||(nearBlock(b,8,65,12)))){
     const n=Math.min(3,progress(p)+1);
     setProgress(p,n); tell(p,"Cold blue flame inspected: "+n+"/3.");
     if(n>=3){ setStage(p,2); voice(p,"chapel"); title(p,"BLUE FIRE","The silence points toward Elias."); }
