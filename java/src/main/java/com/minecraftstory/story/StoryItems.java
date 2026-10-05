@@ -43,13 +43,13 @@ public final class StoryItems {
                 return InteractionResult.SUCCESS;
             }
             if (item == STAR_IRON_SHARD) {
-                serverPlayer.displayClientMessage(Component.literal(
+                serverPlayer.sendSystemMessage(Component.literal(
                         "Star-Iron Shard: slot it into the Observatory ring after the Ash Lens."
                 ), true);
                 return InteractionResult.SUCCESS;
             }
             if (item == WARDEN_SEAL) {
-                serverPlayer.displayClientMessage(Component.literal(
+                serverPlayer.sendSystemMessage(Component.literal(
                         "Warden Seal: the final relic. Use the ring, then open the marked gate."
                 ), true);
                 return InteractionResult.SUCCESS;
