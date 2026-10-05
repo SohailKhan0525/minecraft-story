@@ -129,7 +129,7 @@ def main() -> int:
     if "UseItemCallback.EVENT" not in story_items:
         raise SystemExit("Java story relics are missing usable-item behavior.")
     story_world = (ROOT / "java/src/main/java/com/minecraftstory/world/StoryWorld.java").read_text(encoding="utf-8")
-    for marker in ("buildStructuredChapterWorldV4", "Blocks.BELL", "buildStaircase(level, 39, 64, -18)"):
+    for marker in ("buildStructuredChapterWorldV4", "buildStructuredChapterWorldV5", "Blocks.BELL", "buildStaircase(level, 39, 64, -18)"):
         if marker not in story_world:
             raise SystemExit("Java world structure is missing: " + marker)
 
